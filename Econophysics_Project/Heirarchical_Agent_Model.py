@@ -12,13 +12,13 @@ import matplotlib.pyplot as plt
 #%%
 #Initialisation
 
-dt=0.1
-sig=2.5
-beta=4
-rho=1.3
+dt=0.001
+sig=0.1
+beta=1.1
+rho=1
 m=15
 N=5
-k=10
+k=1
 n=N-1#
 
 def Hrarchy_Vect(i):
@@ -30,9 +30,8 @@ def Hrarchy_Vect(i):
 def PDF(t,k,sig,rho):
     return k*sig**rho*np.exp(-k*sig**rho*t)*dt
 
-def Cheat_PDF(t,k,sig,rho):
-    return 0.1*np.exp(-sig)
-    
+def Buy_Probability(s,k=k,sig=sig,rho=rho,beta=beta,dt=dt):
+    return k*sig**rho*2**(beta*s)*dt
 
 #%%
 #Performing iterations
@@ -43,6 +42,7 @@ sales=np.array([])
 sigmas=sig*np.ones(m**n)
 Hrarchy_Sold_Bool=np.zeros((N,m**n))
 Hrarchy_Sold_Numbers=np.zeros((N,m**n))
+S_vector=np.zeros(m**n)
 
 while Finish==0:
     ##############################################
@@ -52,16 +52,15 @@ while Finish==0:
             UnsoldAgntsInds=np.append(UnsoldAgntsInds,i)
     #This bit randomly picks of they sell during the timestep
     for i in UnsoldAgntsInds:
-        Sigma=sigmas[i]
-        Probability=PDF(t,k,Sigma,rho)*dt
+        Probability=Buy_Probability(S_vector[i])
         Random=np.random.rand()
         if Random<=Probability:#Randomly chooses whether to update
             Hrarchy_Sold_Bool[0][i]=1
             for HrarchyRow in range(N):#[0,1,2,...n]
-                #HrarchyRow is heirarchy level we're dealing with
-                Col=Hrarchy_Vect(i)[HrarchyRow]
-                Col=int(Col)
-                Hrarchy_Sold_Numbers[HrarchyRow][Col]+=1
+                #This updates the numerical Hrarchy matrix
+                Column=Hrarchy_Vect(i)[HrarchyRow]
+                Column=int(Column)
+                Hrarchy_Sold_Numbers[HrarchyRow][Column]+=1
     
     #Getting boolean Hrarchy matrix from numerical matrix
     for i in range(1,N):
@@ -86,15 +85,21 @@ while Finish==0:
         for j in range(1,N):
             S+=Hrarchy_S[j][Vector_i[j]]
         S_vector[i]=S    
-        #This calculates new sigmas
-        sigmas[i]=sig*2**(-S_vector[i]*beta/rho)  
         
+       
+    #This calculates adaptive timestep
+    #If S>3, we choose dt s.t. buy probability = 1/m for highest s value
+    biggest_s=max(S_vector)
+    dt=1/15*1/(k*sig**rho*2**(beta*biggest_s))
+    
+    
     if t>=500:
         Finish=1
     
     ###############################################
     print(t)
     print(Hrarchy_Sold_Numbers[n][0])
+    print(k*sig**rho*2**(beta*biggest_s))
     times=np.append(times,t)
     sales=np.append(sales,Hrarchy_Sold_Numbers[n][0])
     if Hrarchy_Sold_Bool[n][0]==1:
