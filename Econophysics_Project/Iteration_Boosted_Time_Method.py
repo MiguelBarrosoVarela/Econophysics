@@ -17,7 +17,7 @@ beta=1.1
 rho=1
 k=1
 m=2#Number of subgroups per group
-N=10#Number of levels in heirarchy including top layer with everyone
+N=8#Number of levels in heirarchy including top layer with everyone
 n=N-1#
 
 
@@ -123,7 +123,7 @@ while Finish==0:
             S+=Hrarchy_S[j][Vector_i[j]]
         S_vector[i]=S    
     #This calculates new_sigmas
-        sigmas[i]=sig*2**(-S_vector[i]*beta/rho)    
+        sigmas[i]=sig*2**(S_vector[i]*beta/rho)    
     
     """
     Generate new buy times
