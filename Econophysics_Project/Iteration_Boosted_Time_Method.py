@@ -6,7 +6,7 @@ Created on Tue Jan 25 17:46:20 2022
 """
 import numpy as np
 import matplotlib.pyplot as plt
-
+import random
 
 #%%
 #Initialisation
@@ -16,9 +16,16 @@ sig=0.1
 beta=1.1
 rho=1
 k=1
-m=15#Number of subgroups per group
-N=5#Number of levels in heirarchy including top layer with everyone
+m=2#Number of subgroups per group
+N=10#Number of levels in heirarchy including top layer with everyone
 n=N-1#
+
+
+
+def Boost(x): # x is the array of times
+  t=min(x) #find smallest time
+  buyer=x.index(t) #find index of buyer
+  return(t,buyer)
 
 def Hrarchy_Vect(i):
     vect=np.zeros(N,dtype=int)
@@ -50,6 +57,9 @@ Need to initialise buy_time array - so first buy-time array
 
 """
 
+TimeArray=[-np.log(1-random.random())/(k*sig**rho) for i in range(m**n)] #Generate times from distribution
+
+
 while Finish==0:
     ##############################################
     
@@ -60,7 +70,14 @@ while Finish==0:
         if Hrarchy_Sold_Bool[0][i]==0:
             UnsoldAgntsInds=np.append(UnsoldAgntsInds,i)
             
+    t,buyer=Boost(TimeArray)  #Finds smallest time and the buyer index corresponding to that time
     
+    Hrarchy_Sold_Bool[0][buyer]=1
+    for HrarchyRow in range(N):#[0,1,2,...n]
+        #This updates the numerical Hrarchy matrix
+        Column=Hrarchy_Vect(buyer)[HrarchyRow]
+        Column=int(Column)
+        Hrarchy_Sold_Numbers[HrarchyRow][Column]+=1
     """
     Boost
     -----
@@ -124,16 +141,22 @@ while Finish==0:
 
     """
     
+    for j in range(len(TimeArray)):
+        if S_vector[j]==S_vector_old[j]:  #Does what is described above
+            pass
+        else: #generates new time using the new sigmas 
+            TimeArray[j]=t-(np.log(1-random.random())/(k*sigmas[j]**rho))
+    
     ###############################################
     print(t)# Current time 
     print(Hrarchy_Sold_Numbers[n][0])#Total number of bought agents
     times=np.append(times,t)
     sales=np.append(sales,Hrarchy_Sold_Numbers[n][0])
     S_vector_old=S_vector 
+    TimeArray[buyer]=1e7 #make sure this buyer never gets picked again by boost method
     if Hrarchy_Sold_Bool[n][0]==1:
         Finish=1
-    else:
-        t+=dt
+    #t+=dt, assumed this bit is no longer needed as no longer using FD method
         
 #%%
 #plotting 
