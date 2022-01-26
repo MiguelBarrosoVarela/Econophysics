@@ -11,7 +11,7 @@ import random
 k=1
 sigma_rho=2 #sigma^rho
 beta=2
-Order=14 #number of levels of hierarchy
+Order=12 #number of levels of hierarchy
 
 N=2**(Order-1)
 times=[-np.log(1-random.random())/(k*sigma_rho) for i in range(N)] #Generate times from distribution
@@ -19,6 +19,8 @@ buy=[]
 for i in range(Order):
   buy.append(np.zeros(2**(Order-1-i)))  #for each level of hierarchy generate array of zeros of respective size
 
+
+#%%
 
 def Boost(x,n): #n is number of iteration, x is the array of times
   t=min(x) #find smallest time
