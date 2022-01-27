@@ -17,7 +17,7 @@ beta=1.1
 rho=1
 k=1
 m=2#Number of subgroups per group
-N=8#Number of levels in heirarchy including top layer with everyone
+N=10#Number of levels in heirarchy including top layer with everyone
 n=N-1#
 
 
@@ -160,11 +160,26 @@ while Finish==0:
         
 #%%
 #plotting 
+plt.figure(0)
+plt.xlabel(r'Non-dimensional time ',size=15)
+plt.ylabel('Buyers',size=15) 
 plt.plot(times,sales)
         
+#%%
 
+#Log Plotting (Very Meh)
 
-        
+tc=times[-1]
+LoggedTimes=[]
+for j in times:
+    if j<tc:
+        LoggedTimes.append(np.log(tc-j))
+
+plt.figure(1)
+plt.gca().invert_xaxis()
+plt.xlabel(r'log($t_c-t$)',size=15)
+plt.ylabel('Log(Buyers)',size=15) 
+plt.plot(LoggedTimes,np.log(sales[:len(LoggedTimes):]))
         
     
 
