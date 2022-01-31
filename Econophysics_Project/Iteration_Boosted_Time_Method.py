@@ -13,11 +13,11 @@ import random
 
 dt=0.001
 sig=3
-beta=1.1
+beta=3
 rho=1
 k=1
 m=2#Number of subgroups per group
-N=10#Number of levels in heirarchy including top layer with everyone
+N=12#Number of levels in heirarchy including top layer with everyone
 n=N-1#
 
 
@@ -142,7 +142,7 @@ while Finish==0:
     """
     
     for j in range(len(TimeArray)):
-        if S_vector[j]==S_vector_old[j]:  #Does what is described above
+        if S_vector[j]==S_vector_old[j] or TimeArray[j]==1e7:  #Does what is described above
             pass
         else: #generates new time using the new sigmas 
             TimeArray[j]=t-(np.log(1-random.random())/(k*sigmas[j]**rho))
