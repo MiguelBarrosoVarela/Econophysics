@@ -152,6 +152,9 @@ while Finish==0:
     print(Hrarchy_Sold_Numbers[n][0])#Total number of bought agents
     times=np.append(times,t)
     sales=np.append(sales,Hrarchy_Sold_Numbers[n][0])
+    #plt.plot(times,sales,'k')    
+    #plt.show()                     #in case you want to animate the market
+    #plt.pause(0.00001)             #this makes code slower of course
     S_vector_old=S_vector 
     TimeArray[buyer]=1e7 #make sure this buyer never gets picked again by boost method
     if Hrarchy_Sold_Bool[n][0]==1:
