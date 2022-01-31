@@ -12,12 +12,12 @@ import random
 #Initialisation
 
 dt=0.001
-sig=0.1
-beta=1.1
+sig=0.01
+beta=0.4
 rho=1
 k=1
 m=2#Number of subgroups per group
-N=10#Number of levels in heirarchy including top layer with everyone
+N=15#Number of levels in heirarchy including top layer with everyone
 n=N-1#
 
 
@@ -163,8 +163,9 @@ while Finish==0:
 plt.figure(0)
 plt.xlabel(r'Non-dimensional time ',size=15)
 plt.ylabel('Buyers',size=15) 
-plt.plot(times,sales)
-        
+
+plt.plot(times,sales,label=r'$\sigma^{\rho}=$'+str(sig)+ r' , $\beta$= '+str(beta)+', N='+str(m**n))
+plt.legend()    
 #%%
 
 #Log Plotting (Very Meh)
