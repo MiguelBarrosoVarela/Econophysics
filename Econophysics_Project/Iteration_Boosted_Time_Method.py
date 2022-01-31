@@ -12,12 +12,12 @@ import random
 #Initialisation
 
 dt=0.001
-sig=0.01
-beta=0.4
+sig=3
+beta=1.1
 rho=1
 k=1
 m=2#Number of subgroups per group
-N=15#Number of levels in heirarchy including top layer with everyone
+N=10#Number of levels in heirarchy including top layer with everyone
 n=N-1#
 
 
