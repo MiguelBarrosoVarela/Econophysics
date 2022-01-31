@@ -179,7 +179,7 @@ for j in times:
     if j<tc:
         LoggedTimes.append(np.log(tc-j))
 
-plt.figure(1)
+plt.figure(2)
 plt.gca().invert_xaxis()
 plt.xlabel(r'log($t_c-t$)',size=15)
 plt.ylabel('Log(Buyers)',size=15) 
