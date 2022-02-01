@@ -11,7 +11,7 @@ import random
 #%%
 #Initialisation
 
-dt=0.001
+
 sig=3
 beta=3
 rho=1
@@ -19,12 +19,13 @@ k=1
 m=2#Number of subgroups per group
 N=12#Number of levels in heirarchy including top layer with everyone
 n=N-1#
+agents=m**n
 
 
 
 def Boost(x): # x is the array of times
   t=min(x) #find smallest time
-  buyer=x.index(t) #find index of buyer
+  buyer=np.where(x == t)[0] #find index of buyer
   return(t,buyer)
 
 def Hrarchy_Vect(i):
@@ -33,15 +34,12 @@ def Hrarchy_Vect(i):
         vect[l]=i//m**l
     return vect
 
-def PDF(t,k,sig,rho):
-    return k*sig**rho*np.exp(-k*sig**rho*t)*dt
 
-def Buy_Probability(s,k=k,sig=sig,rho=rho,beta=beta,dt=dt):
-    return k*sig**rho*2**(beta*s)*dt
+
 
 #%%
 #Performing iterations
-S_vector_old=np.zeros(m**n)
+S_vector_old=np.zeros(agents)
 Change_Times_List=[]
 t=0#Initialising time
 Finish=0
@@ -49,35 +47,34 @@ times=np.array([])#List of times where agents buy
 sales=np.array([])#Sales at each time where agents buy
 sigmas=sig*np.ones(m**n)# List of sigma values for agents
 S_vector=np.zeros(m**n)#List of S values
-Hrarchy_Sold_Bool=np.zeros((N,m**n))
-Hrarchy_Sold_Numbers=np.zeros((N,m**n))
+Hrarchy_Sold_Bool=np.zeros((N,agents))
+Hrarchy_Sold_Numbers=np.zeros((N,agents))
 
 """
 Need to initialise buy_time array - so first buy-time array
 
 """
 
-TimeArray=[-np.log(1-random.random())/(k*sig**rho) for i in range(m**n)] #Generate times from distribution
+TimeArray=np.array([-np.log(1-random.random())/(k*sig**rho) for i in range(agents)]) #Generate times from distribution
 
 
-while Finish==0:
+while Hrarchy_Sold_Bool[n][0]==0:
     ##############################################
     
     #This bit creates list of indices of agents who haven't sold
     #This could be streamlined with new boost method, but we'll do that later. 
-    UnsoldAgntsInds=np.array([],dtype=int)
-    for i in range(m**n):
-        if Hrarchy_Sold_Bool[0][i]==0:
-            UnsoldAgntsInds=np.append(UnsoldAgntsInds,i)
+    
+    # UnsoldAgntsInds=np.array([],dtype=int)
+    # for i in range(m**n):
+    #     if Hrarchy_Sold_Bool[0][i]==0:
+    #         UnsoldAgntsInds=np.append(UnsoldAgntsInds,i)
             
     t,buyer=Boost(TimeArray)  #Finds smallest time and the buyer index corresponding to that time
     
     Hrarchy_Sold_Bool[0][buyer]=1
     for HrarchyRow in range(N):#[0,1,2,...n]
         #This updates the numerical Hrarchy matrix
-        Column=Hrarchy_Vect(buyer)[HrarchyRow]
-        Column=int(Column)
-        Hrarchy_Sold_Numbers[HrarchyRow][Column]+=1
+        Hrarchy_Sold_Numbers[HrarchyRow][int(Hrarchy_Vect(buyer)[HrarchyRow])]+=1
     """
     Boost
     -----
@@ -106,7 +103,7 @@ while Finish==0:
                 Hrarchy_Sold_Bool[i][j]=1
     
     #Getting matrix to find S values
-    Hrarchy_S=np.zeros((N,m**n))#number of full n-1 order objcts in n ordr obj        
+    Hrarchy_S=np.zeros((N,agents))#number of full n-1 order objcts in n ordr obj        
     Hrarchy_S[0]=Hrarchy_Sold_Numbers[0]
     Hrarchy_S[1]=Hrarchy_Sold_Numbers[1]
     for row in range(1,n):
@@ -115,15 +112,15 @@ while Finish==0:
                 Hrarchy_S[row+1][i//m]+=1
     
     #This calculates S value vector 
-    S_vector=np.zeros(m**n)
-    for i in range(m**n):
+    S_vector=np.zeros(agents)
+    for i in range(agents):
         Vector_i=Hrarchy_Vect(i)
         S=0
         for j in range(1,N):
             S+=Hrarchy_S[j][Vector_i[j]]
         S_vector[i]=S    
     #This calculates new_sigmas
-        sigmas[i]=sig*2**(S_vector[i]*beta/rho)    
+        sigmas[i]=sig**rho*2**(S_vector[i]*beta)    
     
     """
     Generate new buy times
@@ -145,7 +142,7 @@ while Finish==0:
         if S_vector[j]==S_vector_old[j] or TimeArray[j]==1e7:  #Does what is described above
             pass
         else: #generates new time using the new sigmas 
-            TimeArray[j]=t-(np.log(1-random.random())/(k*sigmas[j]**rho))
+            TimeArray[j]=t-(np.log(1-random.random())/(k*sigmas[j]))
     
     ###############################################
     print(t)# Current time 
@@ -157,8 +154,7 @@ while Finish==0:
     #plt.pause(0.00001)             #this makes code slower of course
     S_vector_old=S_vector 
     TimeArray[buyer]=1e7 #make sure this buyer never gets picked again by boost method
-    if Hrarchy_Sold_Bool[n][0]==1:
-        Finish=1
+  
     #t+=dt, assumed this bit is no longer needed as no longer using FD method
         
 #%%
