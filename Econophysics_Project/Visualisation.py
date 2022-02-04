@@ -16,7 +16,7 @@ beta=3
 rho=1
 k=1
 m=2#Number of subgroups per group
-N=3#Number of levels in heirarchy including top layer with everyone
+N=6#Number of levels in heirarchy including top layer with everyone
 n=N-1#
 agents=m**n
 
@@ -35,6 +35,21 @@ def Hrarchy_Vect(i):
 
 
 
+
+#%%
+
+length=400
+height=length/N
+plt.axes()
+for i in range(N):
+    
+    for j in range(m**i):  
+        rectangle = plt.Rectangle((j*length*m**(-i),height*i), length*m**(-i), height, fc='white',ec="black")
+        plt.gca().add_patch(rectangle)
+
+
+plt.axis('scaled')
+plt.show()
 
 #%%
 #Performing iterations
@@ -71,6 +86,10 @@ while Hrarchy_Sold_Bool[n][0]==0:
     t,buyer=Boost(TimeArray)  #Finds smallest time and the buyer index corresponding to that time
     
     Hrarchy_Sold_Bool[0][buyer]=1
+    rectangle = plt.Rectangle((buyer*length*m**(-n),height*n), length*m**(-n), height, fc='red',ec="black")
+    plt.gca().add_patch(rectangle)
+ 
+    
     for HrarchyRow in range(N):#[0,1,2,...n]
         #This updates the numerical Hrarchy matrix
         Hrarchy_Sold_Numbers[HrarchyRow][int(Hrarchy_Vect(buyer)[HrarchyRow])]+=1
@@ -100,7 +119,10 @@ while Hrarchy_Sold_Bool[n][0]==0:
         for j in range(m**(n-i)):
             if Hrarchy_Sold_Numbers[i][j]==m**i:
                 Hrarchy_Sold_Bool[i][j]=1
-    
+                rectangle = plt.Rectangle((j*length*m**(-n+i),height*(n-i)), length*m**(-n+i), height, fc='red',ec="black")
+                plt.gca().add_patch(rectangle)
+                  
+    plt.pause(1e-20)          
     #Getting matrix to find S values
     Hrarchy_S=np.zeros((N,agents))#number of full n-1 order objcts in n ordr obj        
     Hrarchy_S[0]=Hrarchy_Sold_Numbers[0]
@@ -154,36 +176,9 @@ while Hrarchy_Sold_Bool[n][0]==0:
     S_vector_old=S_vector 
     TimeArray[buyer]=1e7 #make sure this buyer never gets picked again by boost method
 
-#%%
-
-m=2#Number of subgroups per group
-N=10#Number of levels in heirarchy including top layer with everyone
-n=N-1#
-agents=m**n
-length=400
-height=10
-plt.axes()
-for i in range(N):
-    
-    for j in range(m**i):  
-        rectangle = plt.Rectangle((j*length,height*i), length, height, fc='white',ec="black")
-        plt.gca().add_patch(rectangle)
-    length=length/2
-
-plt.axis('scaled')
-#%%
-plt.axes()
-rectangle = plt.Rectangle((0,0), 50, 20, fc='white',ec="black")
-plt.gca().add_patch(rectangle)
-rectangle = plt.Rectangle((50,0), 50, 20, fc='white',ec="black")
-plt.gca().add_patch(rectangle)
-rectangle = plt.Rectangle((25,20), 50, 20, fc='white',ec="black")
-plt.gca().add_patch(rectangle)
 
 
-rectangle = plt.Rectangle((50,0), 50, 20, fc='black',ec="black")
-plt.gca().add_patch(rectangle)
-plt.axis('scaled')
+
 
 
         
