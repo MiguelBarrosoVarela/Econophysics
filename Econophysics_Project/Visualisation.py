@@ -12,7 +12,7 @@ import random
 
 
 sig=3
-beta=3
+beta=1.2
 rho=1
 k=1
 m=2#Number of subgroups per group
