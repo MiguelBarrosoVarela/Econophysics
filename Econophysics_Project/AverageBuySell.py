@@ -13,11 +13,11 @@ import random
 
 
 sig=3
-beta=0
+beta=0.02
 rho=1
 k=1
 m=2#Number of subgroups per group
-N=9#Number of levels in heirarchy including top layer with everyone
+N=10#Number of levels in heirarchy including top layer with everyone
 n=N-1#
 agents=m**n
 
@@ -50,8 +50,10 @@ S_vector=np.zeros(m**n)#List of S values
 Hrarchy_Sold_Bool=np.zeros((N,agents))
 Hrarchy_Sold_Numbers=np.zeros((N,agents))
 
+Split=0.5 # Approximate Starting Conditions: N_sellers/N_total
+
 for i in range(agents):
-    Hrarchy_Sold_Bool[0][i]=np.sign(random.random()-0.5)
+    Hrarchy_Sold_Bool[0][i]=np.sign(random.random()-1+Split)
 for i in range(1,N):
     for j in range(m**(n-i)):
             Hrarchy_Sold_Bool[i][j]=sum(Hrarchy_Sold_Bool[i-1][j*m+k] for k in range(m))/m
@@ -95,7 +97,8 @@ while abs(Hrarchy_Sold_Bool[n][0])!=1:
     for i in range(agents):
         S_vector[i]=sum(Hrarchy_Sold_Bool[j][int(i/(m**j))] for j in range(1,N))   
     #This calculates new_sigmas
-        sigmas[i]=sig**rho*2**(S_vector[i]*beta)    
+        sign=np.sign(Hrarchy_Sold_Bool[0][i]) #determine which type of agent it is
+        sigmas[i]=sig**rho*2**(-sign*S_vector[i]*beta)    
     
     """
     Generate new buy times
