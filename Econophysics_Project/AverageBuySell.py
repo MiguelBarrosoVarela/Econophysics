@@ -1,9 +1,9 @@
 # -*- coding: utf-8 -*-
 """
-Created on Tue Jan 25 17:46:20 2022
+Created on Mon Feb  7 16:14:50 2022
 
-@author: Hugo Rauch
 """
+
 import numpy as np
 import matplotlib.pyplot as plt
 import random
@@ -13,11 +13,11 @@ import random
 
 
 sig=3
-beta=3
+beta=0
 rho=1
 k=1
 m=2#Number of subgroups per group
-N=12#Number of levels in heirarchy including top layer with everyone
+N=9#Number of levels in heirarchy including top layer with everyone
 n=N-1#
 agents=m**n
 
@@ -50,15 +50,24 @@ S_vector=np.zeros(m**n)#List of S values
 Hrarchy_Sold_Bool=np.zeros((N,agents))
 Hrarchy_Sold_Numbers=np.zeros((N,agents))
 
+for i in range(agents):
+    Hrarchy_Sold_Bool[0][i]=np.sign(random.random()-0.5)
+for i in range(1,N):
+    for j in range(m**(n-i)):
+            Hrarchy_Sold_Bool[i][j]=sum(Hrarchy_Sold_Bool[i-1][j*m+k] for k in range(m))/m
+
+            
+
 """
 Need to initialise buy_time array - so first buy-time array
 
 """
 
+
 TimeArray=np.array([-np.log(1-random.random())/(k*sig**rho) for i in range(agents)]) #Generate times from distribution
+#%%
 
-
-while Hrarchy_Sold_Bool[n][0]==0:
+while abs(Hrarchy_Sold_Bool[n][0])!=1:
     ##############################################
     
     #This bit creates list of indices of agents who haven't sold
@@ -71,54 +80,20 @@ while Hrarchy_Sold_Bool[n][0]==0:
             
     t,buyer=Boost(TimeArray)  #Finds smallest time and the buyer index corresponding to that time
     
-    Hrarchy_Sold_Bool[0][buyer]=1
-    for HrarchyRow in range(N):#[0,1,2,...n]
-        #This updates the numerical Hrarchy matrix
-        Hrarchy_Sold_Numbers[HrarchyRow][int(Hrarchy_Vect(buyer)[HrarchyRow])]+=1
-    """
-    Boost
-    -----
     
-    List/Array of buy_times from previous iteration or initialisation) known. 
-    From list of indices of unsold agents, find smallest time t'. 
-    t=t', append this to times array. 
-    
-    Index of agent with buy time t' is i. Then assert that this guy has sold 
-    using:
-        
-    Hrarchy_Sold_Bool[0][i]=1
-    for HrarchyRow in range(N):#[0,1,2,...n]
-        #This updates the numerical Hrarchy matrix
-        Column=Hrarchy_Vect(i)[HrarchyRow]
-        Column=int(Column)
-        Hrarchy_Sold_Numbers[HrarchyRow][Column]+=1
-    
-    Now the code knows this guy has sold. Continue with the origianl code: 
-    """
+    Hrarchy_Sold_Bool[0][buyer]*=-1
     
     #Getting boolean Hrarchy matrix from numerical matrix
     for i in range(1,N):
         for j in range(m**(n-i)):
-            if Hrarchy_Sold_Numbers[i][j]==m**i:
-                Hrarchy_Sold_Bool[i][j]=1
+            Hrarchy_Sold_Bool[i][j]=sum(Hrarchy_Sold_Bool[i-1][j*m+k] for k in range(m))/m
     
-    #Getting matrix to find S values
-    Hrarchy_S=np.zeros((N,agents))#number of full n-1 order objcts in n ordr obj        
-    Hrarchy_S[0]=Hrarchy_Sold_Numbers[0]
-    Hrarchy_S[1]=Hrarchy_Sold_Numbers[1]
-    for row in range(1,n):
-        for i in range(0,m**(n-row)):
-            if Hrarchy_S[row][i]==m:
-                Hrarchy_S[row+1][i//m]+=1
+
     
     #This calculates S value vector 
     S_vector=np.zeros(agents)
     for i in range(agents):
-        Vector_i=Hrarchy_Vect(i)
-        S=0
-        for j in range(1,N):
-            S+=Hrarchy_S[j][Vector_i[j]]
-        S_vector[i]=S    
+        S_vector[i]=sum(Hrarchy_Sold_Bool[j][int(i/(m**j))] for j in range(1,N))   
     #This calculates new_sigmas
         sigmas[i]=sig**rho*2**(S_vector[i]*beta)    
     
@@ -139,48 +114,32 @@ while Hrarchy_Sold_Bool[n][0]==0:
     """
     
     for j in range(len(TimeArray)):
-        if S_vector[j]==S_vector_old[j] or TimeArray[j]==1e7:  #Does what is described above
+        if S_vector[j]==S_vector_old[j]:  #Does what is described above
             pass
         else: #generates new time using the new sigmas 
             TimeArray[j]=t-(np.log(1-random.random())/(k*sigmas[j]))
-    
+            
+
     ###############################################
     print(t)# Current time 
-    print(Hrarchy_Sold_Numbers[n][0])#Total number of bought agents
+    SUM=sum(Hrarchy_Sold_Bool[0][j] for j in range(agents))
+    print(SUM)#Total number of bought agents
     times=np.append(times,t)
-    sales=np.append(sales,Hrarchy_Sold_Numbers[n][0])
-    #plt.plot(times,sales,'k')    
-    #plt.show()                     #in case you want to animate the market
-    #plt.pause(0.00001)             #this makes code slower of course
+    sales=np.append(sales,SUM)
+    plt.plot(times,sales,'k')    
+    plt.show()                     #in case you want to animate the market
+    plt.pause(0.0000001)             #this makes code slower of course
     S_vector_old=S_vector 
-    TimeArray[buyer]=1e7 #make sure this buyer never gets picked again by boost method
+    #make sure this buyer never gets picked again by boost method
   
     #t+=dt, assumed this bit is no longer needed as no longer using FD method
-        
-#%%
-#plotting 
+#%%        
 plt.figure(0)
 plt.xlabel(r'Non-dimensional time ',size=15)
 plt.ylabel('Buyers',size=15) 
 
 plt.plot(times,sales,label=r'$\sigma^{\rho}=$'+str(sig)+ r' , $\beta$= '+str(beta)+', N='+str(m**n))
 plt.legend()    
-#%%
-
-#Log Plotting
-
-tc=times[-1]
-LoggedTimes=[]
-for j in times:
-    if j<tc:
-        LoggedTimes.append(np.log(tc-j))
-
-plt.figure(2)
-plt.gca().invert_xaxis()
-plt.xlabel(r'log($t_c-t$)',size=15)
-plt.ylabel('Log(Buyers)',size=15) 
-plt.plot(LoggedTimes,np.log(sales[:len(LoggedTimes):]))
         
     
-
 
