@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-Created on Mon Feb  7 16:14:50 2022
+Created on Thu Feb 10 14:51:56 2022
 
 """
 
@@ -17,7 +17,7 @@ beta=0
 rho=1
 k=1
 m=2#Number of subgroups per group
-N=10#Number of levels in heirarchy including top layer with everyone
+N=6#Number of levels in heirarchy including top layer with everyone
 n=N-1#
 agents=m**n
 
@@ -33,6 +33,7 @@ def Hrarchy_Vect(i):
     for l in range(N):# l=[0,1,...n]
         vect[l]=i//m**l
     return vect
+
 
 
 
@@ -68,6 +69,30 @@ Need to initialise buy_time array - so first buy-time array
 TimeArray=np.array([-np.log(1-random.random())/(k*sig**rho) for i in range(agents)]) #Generate times from distribution
 t,buyer=Boost(TimeArray)
 t_old=t
+
+
+#%%
+
+
+length=400
+height=length/N
+plt.axes()
+for i in range(N):
+    
+    for j in range(m**i):  
+      if Hrarchy_Sold_Bool[-i-1][j]<0:   
+          rectangle = plt.Rectangle((j*length*m**(-i),height*i), length*m**(-i), height, fc='red',ec="black")
+          plt.gca().add_patch(rectangle)
+      elif Hrarchy_Sold_Bool[-i-1][j]>0: 
+          rectangle = plt.Rectangle((j*length*m**(-i),height*i), length*m**(-i), height, fc='blue',ec="black")
+          plt.gca().add_patch(rectangle)
+      else:
+          rectangle = plt.Rectangle((j*length*m**(-i),height*i), length*m**(-i), height, fc='white',ec="black")
+          plt.gca().add_patch(rectangle)
+
+plt.axis('scaled')
+plt.show()
+
 #%%
 BuyingPercentage=0.9 #Choose when the market is considered to be dominated
 
@@ -80,6 +105,8 @@ while abs(Hrarchy_Sold_Bool[n][0])<BuyingPercentage:
     t_old=t  
     
     Hrarchy_Sold_Bool[0][buyer]*=-1 #Flip the buyer/seller to seller/buyer
+    
+    
     
     #Getting averages matrix
     for i in range(1,N):
@@ -110,9 +137,9 @@ while abs(Hrarchy_Sold_Bool[n][0])<BuyingPercentage:
     print(SUM)#Total number of bought agents
     times=np.append(times,t)
     sales=np.append(sales,SUM)
-    plt.plot(times,sales,'k')    
-    plt.show()                     #in case you want to animate the market
-    plt.pause(0.0000001)             #this makes code slower of course
+    #plt.plot(times,sales,'k')    
+    #plt.show()                     #in case you want to animate the market
+    #plt.pause(0.0000001)             #this makes code slower of course
     S_vector_old=S_vector 
 
 #%%        
@@ -123,5 +150,3 @@ plt.ylabel('Buyers',size=15)
 plt.plot(times,sales,label=r'$\sigma^{\rho}=$'+str(sig)+ r' , $\beta$= '+str(beta)+', N='+str(m**n)+r', Sold/Bought Fraction='+str(BuyingPercentage))
 plt.legend()    
         
-    
-
