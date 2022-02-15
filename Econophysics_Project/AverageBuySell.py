@@ -13,7 +13,7 @@ import random
 
 
 sig=3
-beta=0
+beta=1
 rho=1
 k=1
 m=2#Number of subgroups per group
@@ -28,11 +28,6 @@ def Boost(x): # x is the array of times
   buyer=np.where(x == t)[0] #find index of buyer
   return(t,buyer)
 
-def Hrarchy_Vect(i):
-    vect=np.zeros(N,dtype=int)
-    for l in range(N):# l=[0,1,...n]
-        vect[l]=i//m**l
-    return vect
 
 
 

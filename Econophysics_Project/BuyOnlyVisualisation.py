@@ -16,7 +16,7 @@ beta=1.2
 rho=1
 k=1
 m=2#Number of subgroups per group
-N=8#Number of levels in heirarchy including top layer with everyone
+N=7#Number of levels in heirarchy including top layer with everyone
 n=N-1#
 agents=m**n
 
@@ -50,6 +50,8 @@ for i in range(N):
 
 plt.axis('scaled')
 plt.show()
+filenumber=0
+plt.savefig('Visualisation\Gif'+str(filenumber)+'.png')
 
 #%%
 #Performing iterations
@@ -73,15 +75,7 @@ TimeArray=np.array([-np.log(1-random.random())/(k*sig**rho) for i in range(agent
 
 
 while Hrarchy_Sold_Bool[n][0]==0:
-    ##############################################
-    
-    #This bit creates list of indices of agents who haven't sold
-    #This could be streamlined with new boost method, but we'll do that later. 
-    
-    # UnsoldAgntsInds=np.array([],dtype=int)
-    # for i in range(m**n):
-    #     if Hrarchy_Sold_Bool[0][i]==0:
-    #         UnsoldAgntsInds=np.append(UnsoldAgntsInds,i)
+    filenumber+=1
             
     t,buyer=Boost(TimeArray)  #Finds smallest time and the buyer index corresponding to that time
     
@@ -93,26 +87,8 @@ while Hrarchy_Sold_Bool[n][0]==0:
     for HrarchyRow in range(N):#[0,1,2,...n]
         #This updates the numerical Hrarchy matrix
         Hrarchy_Sold_Numbers[HrarchyRow][int(Hrarchy_Vect(buyer)[HrarchyRow])]+=1
-    """
-    Boost
-    -----
-    
-    List/Array of buy_times from previous iteration or initialisation) known. 
-    From list of indices of unsold agents, find smallest time t'. 
-    t=t', append this to times array. 
-    
-    Index of agent with buy time t' is i. Then assert that this guy has sold 
-    using:
-        
-    Hrarchy_Sold_Bool[0][i]=1
-    for HrarchyRow in range(N):#[0,1,2,...n]
-        #This updates the numerical Hrarchy matrix
-        Column=Hrarchy_Vect(i)[HrarchyRow]
-        Column=int(Column)
-        Hrarchy_Sold_Numbers[HrarchyRow][Column]+=1
-    
-    Now the code knows this guy has sold. Continue with the origianl code: 
-    """
+
+    plt.savefig('Visualisation\Gif'+str(filenumber)+'.png')
     
     #Getting boolean Hrarchy matrix from numerical matrix
     for i in range(1,N):
@@ -143,21 +119,7 @@ while Hrarchy_Sold_Bool[n][0]==0:
     #This calculates new_sigmas
         sigmas[i]=sig**rho*2**(S_vector[i]*beta)    
     
-    """
-    Generate new buy times
-    ----------------------
-    
-    S_vector is the list of S values for the agents. E.g. S_vector[3] is the S
-    value for the agent with index 3. Perhaps store the previous s vector and 
-    compare this to the current S_vector. 
-    
-    For the agents with changed S_vector values, generate new times. Use the 
-    PDF to generate dt. Then add dt to t (which is the time of this iteration)
-    - this is their new buy time. 
-
-    
-
-    """
+   
     
     for j in range(len(TimeArray)):
         if S_vector[j]==S_vector_old[j] or TimeArray[j]==1e7:  #Does what is described above
@@ -176,8 +138,8 @@ while Hrarchy_Sold_Bool[n][0]==0:
     S_vector_old=S_vector 
     TimeArray[buyer]=1e7 #make sure this buyer never gets picked again by boost method
 
-
-
+filenumber+=1
+plt.savefig('Visualisation\Gif'+str(filenumber)+'.png')
 
 
 

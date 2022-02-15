@@ -1,8 +1,9 @@
 # -*- coding: utf-8 -*-
 """
-Created on Thu Feb 10 14:51:56 2022
+Created on Tue Feb 15 11:22:29 2022
 
 """
+
 
 import numpy as np
 import matplotlib.pyplot as plt
@@ -13,20 +14,27 @@ import random
 
 
 sig=3
-beta=1.2
+Beta=1.5
 rho=1
 k=1
 m=2#Number of subgroups per group
-N=7#Number of levels in heirarchy including top layer with everyone
+N=8#Number of levels in heirarchy including top layer with everyone
 n=N-1#
 agents=m**n
 
+betaArray=[Beta*random.random() for i in range(agents)]
 
+def beta(i):
+    if t<1.5:
+     return(0)
+    else:
+        return(betaArray[i]*3)
 
 def Boost(x): # x is the array of times
   t=min(x) #find smallest time
   buyer=np.where(x == t)[0] #find index of buyer
   return(t,buyer)
+
 
 
 
@@ -63,75 +71,33 @@ Need to initialise buy_time array - so first buy-time array
 TimeArray=np.array([-np.log(1-random.random())/(k*sig**rho) for i in range(agents)]) #Generate times from distribution
 t,buyer=Boost(TimeArray)
 t_old=t
-
-
 #%%
-
-
-length=400
-height=length/N
-plt.axes()
-for i in range(N):
-    
-    for j in range(m**i):  
-      if Hrarchy_Sold_Bool[-i-1][j]<0:   
-          rectangle = plt.Rectangle((j*length*m**(-i),height*i), length*m**(-i), height, fc='red',ec="black")
-          plt.gca().add_patch(rectangle)
-      elif Hrarchy_Sold_Bool[-i-1][j]>0: 
-          rectangle = plt.Rectangle((j*length*m**(-i),height*i), length*m**(-i), height, fc='blue',ec="black")
-          plt.gca().add_patch(rectangle)
-      else:
-          rectangle = plt.Rectangle((j*length*m**(-i),height*i), length*m**(-i), height, fc='white',ec="black")
-          plt.gca().add_patch(rectangle)
-
-plt.axis('scaled')
-plt.show()
-filenumber=0
-plt.savefig('Visualisation\Gif'+str(filenumber)+'.png')
-#%%
-BuyingPercentage=0.95 #Choose when the market is considered to be dominated
+BuyingPercentage=0.9 #Choose when the market is considered to be dominated
 
 while abs(Hrarchy_Sold_Bool[n][0])<BuyingPercentage:
-     
+   
             
     t,buyer=Boost(TimeArray)  #Finds smallest time and the buyer index corresponding to that time
     if t/t_old>10:
-        text=r', Market Saturation: Time Limit'
         break #stops if the next time to buy is super super far (market dominated)
     t_old=t  
-    filenumber+=1   
+    
     Hrarchy_Sold_Bool[0][buyer]*=-1 #Flip the buyer/seller to seller/buyer
-    
-    
     
     #Getting averages matrix
     for i in range(1,N):
         for j in range(m**(n-i)):
             Hrarchy_Sold_Bool[i][j]=sum(Hrarchy_Sold_Bool[i-1][j*m+k] for k in range(m))/m
     
-    for i in range(N):
-        
-        for j in range(m**i):  
-          if Hrarchy_Sold_Bool[-i-1][j]<0:   
-              rectangle = plt.Rectangle((j*length*m**(-i),height*i), length*m**(-i), height, fc='red',ec="black")
-              plt.gca().add_patch(rectangle)
-          elif Hrarchy_Sold_Bool[-i-1][j]>0: 
-              rectangle = plt.Rectangle((j*length*m**(-i),height*i), length*m**(-i), height, fc='blue',ec="black")
-              plt.gca().add_patch(rectangle)
-          else:
-              rectangle = plt.Rectangle((j*length*m**(-i),height*i), length*m**(-i), height, fc='white',ec="black")
-              plt.gca().add_patch(rectangle)
 
-    plt.pause(1e-5)    
-    plt.savefig('Visualisation\Gif'+str(filenumber)+'.png')
-
+    
     #This calculates S value vector 
     S_vector=np.zeros(agents)
     for i in range(agents):
         S_vector[i]=sum(Hrarchy_Sold_Bool[j][int(i/(m**j))] for j in range(1,N))   
     #This calculates new_sigmas
         sign=np.sign(Hrarchy_Sold_Bool[0][i]) #determine which type of agent it is
-        sigmas[i]=sig**rho*2**(-sign*S_vector[i]*beta)    
+        sigmas[i]=sig**rho*2**(-sign*S_vector[i]*beta(i))    
 
     
     for j in range(len(TimeArray)):
@@ -147,19 +113,17 @@ while abs(Hrarchy_Sold_Bool[n][0])<BuyingPercentage:
     print(SUM)#Total number of bought agents
     times=np.append(times,t)
     sales=np.append(sales,SUM)
-    #plt.plot(times,sales,'k')    
-    #plt.show()                     #in case you want to animate the market
-    #plt.pause(0.0000001)             #this makes code slower of course
+    plt.plot(times,sales,'k')    
+    plt.show()                     #in case you want to animate the market
+    plt.pause(0.0000001)             #this makes code slower of course
     S_vector_old=S_vector 
-    text=r', Sold/Bought Fraction='+str(BuyingPercentage)
 
-filenumber+=1
-plt.savefig('Visualisation\Gif'+str(filenumber)+'.png')
 #%%        
 plt.figure(0)
 plt.xlabel(r'Non-dimensional time ',size=15)
 plt.ylabel('Buyers',size=15) 
 
-plt.plot(times,sales,label=r'$\sigma^{\rho}=$'+str(sig)+ r' , $\beta$= '+str(beta)+', N='+str(m**n)+text)
+plt.plot(times,sales,label=r'$\sigma^{\rho}=$'+str(sig)+ r' , $\beta$= '+str(Beta)+', N='+str(m**n)+r', Sold/Bought Fraction='+str(BuyingPercentage))
 plt.legend()    
         
+    
