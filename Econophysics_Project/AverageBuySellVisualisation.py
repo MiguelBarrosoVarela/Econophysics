@@ -13,11 +13,11 @@ import random
 
 
 sig=3
-beta=0
+beta=1.2
 rho=1
 k=1
 m=2#Number of subgroups per group
-N=6#Number of levels in heirarchy including top layer with everyone
+N=7#Number of levels in heirarchy including top layer with everyone
 n=N-1#
 agents=m**n
 
@@ -92,15 +92,16 @@ for i in range(N):
 
 plt.axis('scaled')
 plt.show()
-
+plt.savefig('Visualisation\Gif'+str(t)+'.png')
 #%%
 BuyingPercentage=0.9 #Choose when the market is considered to be dominated
 
 while abs(Hrarchy_Sold_Bool[n][0])<BuyingPercentage:
-   
+    
             
     t,buyer=Boost(TimeArray)  #Finds smallest time and the buyer index corresponding to that time
     if t/t_old>10:
+        text=r', Market Saturation: Time Limit'
         break #stops if the next time to buy is super super far (market dominated)
     t_old=t  
     
@@ -113,8 +114,22 @@ while abs(Hrarchy_Sold_Bool[n][0])<BuyingPercentage:
         for j in range(m**(n-i)):
             Hrarchy_Sold_Bool[i][j]=sum(Hrarchy_Sold_Bool[i-1][j*m+k] for k in range(m))/m
     
+    for i in range(N):
+        
+        for j in range(m**i):  
+          if Hrarchy_Sold_Bool[-i-1][j]<0:   
+              rectangle = plt.Rectangle((j*length*m**(-i),height*i), length*m**(-i), height, fc='red',ec="black")
+              plt.gca().add_patch(rectangle)
+          elif Hrarchy_Sold_Bool[-i-1][j]>0: 
+              rectangle = plt.Rectangle((j*length*m**(-i),height*i), length*m**(-i), height, fc='blue',ec="black")
+              plt.gca().add_patch(rectangle)
+          else:
+              rectangle = plt.Rectangle((j*length*m**(-i),height*i), length*m**(-i), height, fc='white',ec="black")
+              plt.gca().add_patch(rectangle)
 
-    
+    plt.pause(1e-5)    
+    plt.savefig('Visualisation\Gif'+str(t)+'.png')
+
     #This calculates S value vector 
     S_vector=np.zeros(agents)
     for i in range(agents):
@@ -141,12 +156,13 @@ while abs(Hrarchy_Sold_Bool[n][0])<BuyingPercentage:
     #plt.show()                     #in case you want to animate the market
     #plt.pause(0.0000001)             #this makes code slower of course
     S_vector_old=S_vector 
+    text=r', Sold/Bought Fraction='+str(BuyingPercentage)
 
 #%%        
 plt.figure(0)
 plt.xlabel(r'Non-dimensional time ',size=15)
 plt.ylabel('Buyers',size=15) 
 
-plt.plot(times,sales,label=r'$\sigma^{\rho}=$'+str(sig)+ r' , $\beta$= '+str(beta)+', N='+str(m**n)+r', Sold/Bought Fraction='+str(BuyingPercentage))
+plt.plot(times,sales,label=r'$\sigma^{\rho}=$'+str(sig)+ r' , $\beta$= '+str(beta)+', N='+str(m**n)+text)
 plt.legend()    
         
