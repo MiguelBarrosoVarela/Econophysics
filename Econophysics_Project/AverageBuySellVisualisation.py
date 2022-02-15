@@ -92,12 +92,13 @@ for i in range(N):
 
 plt.axis('scaled')
 plt.show()
-plt.savefig('Visualisation\Gif'+str(t)+'.png')
+filenumber=0
+plt.savefig('Visualisation\Gif'+str(filenumber)+'.png')
 #%%
 BuyingPercentage=0.9 #Choose when the market is considered to be dominated
 
 while abs(Hrarchy_Sold_Bool[n][0])<BuyingPercentage:
-    
+    filenumber+=1    
             
     t,buyer=Boost(TimeArray)  #Finds smallest time and the buyer index corresponding to that time
     if t/t_old>10:
@@ -128,7 +129,7 @@ while abs(Hrarchy_Sold_Bool[n][0])<BuyingPercentage:
               plt.gca().add_patch(rectangle)
 
     plt.pause(1e-5)    
-    plt.savefig('Visualisation\Gif'+str(t)+'.png')
+    plt.savefig('Visualisation\Gif'+str(filenumber)+'.png')
 
     #This calculates S value vector 
     S_vector=np.zeros(agents)
