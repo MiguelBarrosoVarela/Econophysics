@@ -18,7 +18,7 @@ beta=0
 rho=1
 k=1
 m=2#Number of subgroups per group
-N=8#Number of levels in heirarchy including top layer with everyone
+N=10#Number of levels in heirarchy including top layer with everyone
 n=N-1#
 agents=m**n
 
