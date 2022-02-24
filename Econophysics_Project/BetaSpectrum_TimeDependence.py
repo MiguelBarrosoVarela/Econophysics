@@ -14,7 +14,7 @@ import random
 
 
 sig=3
-Beta=0.3
+Beta=3
 rho=1
 k=1
 m=2#Number of subgroups per group
@@ -75,7 +75,7 @@ while abs(Hrarchy_Sold_Bool[n][0])<BuyingPercentage:
    
             
     t,buyer=Boost(TimeArray)  #Finds smallest time and the buyer index corresponding to that time
-    if t/t_old>10:
+    if t-t_old>0.1:
         break #stops if the next time to buy is super super far (market dominated)
     t_old=t  
     

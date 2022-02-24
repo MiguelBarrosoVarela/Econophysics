@@ -1,13 +1,13 @@
 # -*- coding: utf-8 -*-
 """
-Created on Tue Jan 25 17:46:20 2022
+Created on Thu Feb 24 11:41:51 2022
 
-@author: Hugo Rauch
+
 """
 import numpy as np
 import matplotlib.pyplot as plt
 import random
-
+from scipy import optimize
 #%%
 #Initialisation
 
@@ -17,7 +17,7 @@ beta=1
 rho=1
 k=1
 m=2#Number of subgroups per group
-N=12#Number of levels in heirarchy including top layer with everyone
+N=7#Number of levels in heirarchy including top layer with everyone
 n=N-1#
 agents=m**n
 
@@ -55,10 +55,26 @@ Need to initialise buy_time array - so first buy-time array
 
 """
 
-TimeArray=np.array([-np.log(1-random.random())/(k*sig**rho) for i in range(agents)]) #Generate times from distribution
 
+#%%
+tc=[]
+TimeArrayOriginal=np.array([-np.log(1-random.random())/(k*sig**rho) for i in range(agents)]) #Generate times from distribution
+tAvg=np.mean(TimeArrayOriginal)
 
-while Hrarchy_Sold_Bool[n][0]==0:
+for trial in range(2000):
+  print(trial)
+  S_vector_old=np.zeros(agents)
+  Change_Times_List=[]
+  t=0#Initialising time
+  Finish=0
+  times=np.array([])#List of times where agents buy
+  sales=np.array([])#Sales at each time where agents buy
+  sigmas=sig*np.ones(m**n)# List of sigma values for agents
+  S_vector=np.zeros(m**n)#List of S values
+  Hrarchy_Sold_Bool=np.zeros((N,agents))
+  Hrarchy_Sold_Numbers=np.zeros((N,agents))
+  TimeArray=np.array([TimeArrayOriginal[i] for i in range(len(TimeArrayOriginal))])
+  while Hrarchy_Sold_Bool[n][0]==0:
     ##############################################
     
     #This bit creates list of indices of agents who haven't sold
@@ -75,26 +91,7 @@ while Hrarchy_Sold_Bool[n][0]==0:
     for HrarchyRow in range(N):#[0,1,2,...n]
         #This updates the numerical Hrarchy matrix
         Hrarchy_Sold_Numbers[HrarchyRow][int(Hrarchy_Vect(buyer)[HrarchyRow])]+=1
-    """
-    Boost
-    -----
     
-    List/Array of buy_times from previous iteration or initialisation) known. 
-    From list of indices of unsold agents, find smallest time t'. 
-    t=t', append this to times array. 
-    
-    Index of agent with buy time t' is i. Then assert that this guy has sold 
-    using:
-        
-    Hrarchy_Sold_Bool[0][i]=1
-    for HrarchyRow in range(N):#[0,1,2,...n]
-        #This updates the numerical Hrarchy matrix
-        Column=Hrarchy_Vect(i)[HrarchyRow]
-        Column=int(Column)
-        Hrarchy_Sold_Numbers[HrarchyRow][Column]+=1
-    
-    Now the code knows this guy has sold. Continue with the origianl code: 
-    """
     
     #Getting boolean Hrarchy matrix from numerical matrix
     for i in range(1,N):
@@ -122,22 +119,7 @@ while Hrarchy_Sold_Bool[n][0]==0:
     #This calculates new_sigmas
         sigmas[i]=sig**rho*2**(S_vector[i]*beta)    
     
-    """
-    Generate new buy times
-    ----------------------
-    
-    S_vector is the list of S values for the agents. E.g. S_vector[3] is the S
-    value for the agent with index 3. Perhaps store the previous s vector and 
-    compare this to the current S_vector. 
-    
-    For the agents with changed S_vector values, generate new times. Use the 
-    PDF to generate dt. Then add dt to t (which is the time of this iteration)
-    - this is their new buy time. 
-
-    
-
-    """
-    
+   
     for j in range(len(TimeArray)):
         if S_vector[j]==S_vector_old[j] or TimeArray[j]==1e7:  #Does what is described above
             pass
@@ -145,8 +127,8 @@ while Hrarchy_Sold_Bool[n][0]==0:
             TimeArray[j]=t-(np.log(1-random.random())/(k*sigmas[j]))
     
     ###############################################
-    print(t)# Current time 
-    print(Hrarchy_Sold_Numbers[n][0])#Total number of bought agents
+    # Current time 
+    #Total number of bought agents
     times=np.append(times,t)
     sales=np.append(sales,Hrarchy_Sold_Numbers[n][0])
     #plt.plot(times,sales,'k')    
@@ -156,31 +138,24 @@ while Hrarchy_Sold_Bool[n][0]==0:
     TimeArray[buyer]=1e7 #make sure this buyer never gets picked again by boost method
   
     #t+=dt, assumed this bit is no longer needed as no longer using FD method
-        
+  tc.append(times[-1])        
 #%%
 #plotting 
 plt.figure(0)
-plt.xlabel(r'Non-dimensional time ',size=15)
-plt.ylabel('Buyers',size=15) 
-
-plt.plot(times,sales,label=r'$\sigma^{\rho}=$'+str(sig)+ r' , $\beta$= '+str(beta)+', N='+str(m**n))
+plt.xlabel(r'Time of Crash',size=15)
+plt.ylabel('Number of Ocurrences',size=15) 
+BINS=30
+counts,bins,bars=plt.hist(tc,label=r'$t_c=$'+f'{tAvg:.3f}'+r', $\beta=$'+f'{beta:.2f}',density=True,bins=BINS)
 plt.legend()    
-#%%
+centers=[(bins[i]+bins[i+1])/2 for i in range(BINS)]
 
-#Log Plotting
+ExpMean=centers[np.where(counts == np.max(counts))[0][0]]
+def Gaussian(x,mean,sigma,A):
+    return(A*np.exp(-(x-mean)**2/(2*sigma**2)))
 
-tc=times[-1]
-LoggedTimes=[]
-for j in times:
-    if j<tc:
-        LoggedTimes.append(np.log(tc-j))
+Parameters,cov=optimize.curve_fit(Gaussian,centers,counts,p0=[ExpMean,np.std(tc),np.max(counts)])
+plt.plot(centers,Gaussian(centers,Parameters[0],Parameters[1],Parameters[2]),label=r'$\mu$='+f'{Parameters[0]:.3f}'+r', $\sigma=$ '+f'{Parameters[1]:.2f}')
+plt.legend()
 
-plt.figure(2)
-plt.gca().invert_xaxis()
-plt.xlabel(r'log($t_c-t$)',size=15)
-plt.ylabel('Log(Buyers)',size=15) 
-plt.plot(LoggedTimes,np.log(sales[:len(LoggedTimes):]))
-        
-    
 
 

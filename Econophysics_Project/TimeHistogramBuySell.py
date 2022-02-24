@@ -14,7 +14,7 @@ import random
 
 
 sig=3
-beta=0
+Beta=0
 rho=1
 k=1
 m=2#Number of subgroups per group
@@ -29,8 +29,11 @@ def Boost(x): # x is the array of times
   buyer=np.where(x == t)[0] #find index of buyer
   return(t,buyer)
 
-
-
+def beta(t):
+    if t<2 :
+     return(0)
+    else  :
+     return(0)
 
 
 #%%
@@ -61,7 +64,7 @@ t,buyer=Boost(TimeArray)
 t_old=t
 Histogram=[]
 #%%
-BuyingPercentage=0.9 #Choose when the market is considered to be dominated
+BuyingPercentage=0.95 #Choose when the market is considered to be dominated
 
 while abs(Hrarchy_Sold_Bool[n][0])<BuyingPercentage:
    
@@ -87,7 +90,7 @@ while abs(Hrarchy_Sold_Bool[n][0])<BuyingPercentage:
         S_vector[i]=sum(Hrarchy_Sold_Bool[j][int(i/(m**j))] for j in range(1,N))   
     #This calculates new_sigmas
         sign=np.sign(Hrarchy_Sold_Bool[0][i]) #determine which type of agent it is
-        sigmas[i]=sig**rho*2**(-sign*S_vector[i]*beta)    
+        sigmas[i]=sig**rho*2**(-sign*S_vector[i]*beta(t))    
 
     
     for j in range(len(TimeArray)):
@@ -113,6 +116,6 @@ while abs(Hrarchy_Sold_Bool[n][0])<BuyingPercentage:
 plt.figure(0)
 plt.xlabel(r'Buyers-Sellers',size=15)
 plt.ylabel('Number Of Ocurrences',size=15) 
-plt.hist(Histogram,bins=30)
+plt.hist(Histogram,bins=31)
    
         
