@@ -36,6 +36,8 @@ S_vector_old=np.zeros(agents)
 Change_Times_List=[]
 t=0#Initialising time
 Finish=0
+times=[np.array([0]) for i in range(N)]
+sales=[np.array([0]) for i in range(N)]
 times1=np.array([0])#List of times where agents buy
 sales1=np.array([0])#Sales at each time where agents buy
 sigmas=sig*np.ones(m**n)# List of sigma values for agents
@@ -65,9 +67,11 @@ while Hrarchy_Sold_Bool[n][0]==0:
     for HrarchyRow in range(N):#[0,1,2,...n]
         #This updates the numerical Hrarchy matrix
         Hrarchy_Sold_Numbers[HrarchyRow][int(Hrarchy_Vect(buyer)[HrarchyRow])]+=1
-    if Hrarchy_Sold_Numbers[1][buyer//m]==m:
-        sales1=np.append(sales1,sales1[-1]+1)
-        times1=np.append(times1,t)
+    
+    for row in range(n):
+      if Hrarchy_Sold_Numbers[row+1][buyer//(m**(row+1))]==m**(row+1):
+        sales[row+1]=np.append(sales[row+1],sales[row+1][-1]+1)
+        times[row+1]=np.append(times[row+1],t)
     
     #Getting boolean Hrarchy matrix from numerical matrix
     for i in range(1,N):
@@ -107,8 +111,8 @@ while Hrarchy_Sold_Bool[n][0]==0:
     ###############################################
     print(t)# Current time 
     print(Hrarchy_Sold_Numbers[n][0])#Total number of bought agents
-    times0=np.append(times0,t)
-    sales0=np.append(sales0,Hrarchy_Sold_Numbers[n][0])
+    times[0]=np.append(times[0],t)
+    sales[0]=np.append(sales[0],Hrarchy_Sold_Numbers[n][0])
     #plt.plot(times,sales,'k')    
     #plt.show()                     #in case you want to animate the market
     #plt.pause(0.00001)             #this makes code slower of course
@@ -139,8 +143,9 @@ plt.figure(3)
 plt.xlabel(r'Non-dimensional time ',size=15)
 plt.ylabel('Scaled Buyers',size=15) 
 
-plt.plot(times0,sales0,label=r'Order 0 Buyers, $\sigma^{\rho}=$'+str(sig)+ r' , $\beta$= '+str(beta)+', N='+str(m**n))
-plt.plot(times1,sales1*m,label=r'Scaled Order 1 Buyers, $\sigma^{\rho}=$'+str(sig)+ r' , $\beta$= '+str(beta)+', N='+str(m**n))
+
+for i in range(4):
+   plt.plot(times[i],sales[i]*(m**i),label=r'Scaled Order '+f'{i}'+r' Buyers, $\sigma^{\rho}=$'+str(sig)+ r' , $\beta$= '+str(beta)+', N='+str(m**(n-i)))
 
 plt.legend()    
 
@@ -160,6 +165,6 @@ for j in times0:
 plt.figure(2)
 plt.gca().invert_xaxis()
 plt.xlabel(r'log($t_c-t$)',size=15)
-plt.ylabel('Log(Order 1 Buyers)',size=15) 
+plt.ylabel('Log(Order 0 Buyers)',size=15) 
 plt.plot(LoggedTimes,np.log(sales0[:len(LoggedTimes):]))
         

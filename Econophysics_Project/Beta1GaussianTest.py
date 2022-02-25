@@ -13,7 +13,7 @@ beta=1
 rho=1
 k=1
 m=2#Number of subgroups per group
-N=9#Number of levels in heirarchy including top layer with everyone
+N=8#Number of levels in heirarchy including top layer with everyone
 n=N-1#
 agents=m**n
 
@@ -147,7 +147,9 @@ def Gaussian(x,mean,sigma,A):
     return(A*np.exp(-(x-mean)**2/(2*sigma**2)))
 
 Parameters,cov=optimize.curve_fit(Gaussian,centers,counts,p0=[ExpMean,np.std(tc),np.max(counts)])
-plt.plot(centers,Gaussian(centers,Parameters[0],Parameters[1],Parameters[2]),label=r'$\mu$='+f'{Parameters[0]:.3f}'+r', $\sigma=$ '+f'{Parameters[1]:.2f}')
+error=np.sqrt(cov[0][0])
+
+plt.plot(centers,Gaussian(centers,Parameters[0],Parameters[1],Parameters[2]),label=r'$\mu$='+f'{Parameters[0]:.3f}'+r' $\pm$'+f'{error:.3f}'+r', $\sigma=$ '+f'{Parameters[1]:.2f}')
 plt.legend()
 
 
