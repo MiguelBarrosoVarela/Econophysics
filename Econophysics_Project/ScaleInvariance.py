@@ -128,7 +128,7 @@ plt.title('Scale Invariance', size=18)
 plt.xlabel(r'Non-dimensional time ',size=15)
 plt.ylabel('Order 0 Buyers',size=15) 
 
-plt.plot(times0,sales0,label=r'$\sigma^{\rho}=$'+str(sig)+ r' , $\beta$= '+str(beta)+', N='+str(m**n))
+plt.plot(times[0],sales[0],label=r'$\sigma^{\rho}=$'+str(sig)+ r' , $\beta$= '+str(beta)+', N='+str(m**n))
 plt.legend()    
 #%%
 plt.figure(1)
@@ -136,7 +136,7 @@ plt.title('Scale Invariance', size=18)
 plt.xlabel(r'Non-dimensional time ',size=15)
 plt.ylabel('Order 1 Buyers',size=15) 
 
-plt.plot(times1,sales1,label=r'$\sigma^{\rho}=$'+str(sig)+ r' , $\beta$= '+str(beta)+', N='+str(m**n))
+plt.plot(times[1],sales[1],label=r'$\sigma^{\rho}=$'+str(sig)+ r' , $\beta$= '+str(beta)+', N='+str(m**n))
 plt.legend() 
 #%%
 plt.figure(3)
@@ -147,24 +147,37 @@ plt.ylabel('Scaled Buyers',size=15)
 for i in range(4):
    plt.plot(times[i],sales[i]*(m**i),label=r'Scaled Order '+f'{i}'+r' Buyers, $\sigma^{\rho}=$'+str(sig)+ r' , $\beta$= '+str(beta)+', N='+str(m**(n-i)))
 
-plt.legend()    
+plt.legend(prop={"size":11})    
 
 
 
 
 #%%
-
+LogTimes=[]
+LogSales=[]
 #Log Plotting
-
-tc=times0[-1]
-LoggedTimes=[]
-for j in times0:
-    if j<tc:
-        LoggedTimes.append(np.log(tc-j))
-
+for i in range(4):
+    tc=times[0][-1]
+    LoggedTimes=[]
+    LoggedSales=[]
+    for j in range(len(times[i])-2):
+      t=times[i][j+1]   
+      LoggedTimes.append(np.log(tc-t))
+      LoggedSales.append(np.log(sales[i][j+1]*(m**i)))
+    LogTimes.append(LoggedTimes)
+    LogSales.append(LoggedSales)
 plt.figure(2)
 plt.gca().invert_xaxis()
 plt.xlabel(r'log($t_c-t$)',size=15)
-plt.ylabel('Log(Order 0 Buyers)',size=15) 
-plt.plot(LoggedTimes,np.log(sales0[:len(LoggedTimes):]))
+plt.ylabel('Log(Scaled Buyers)',size=15) 
+
+for i in range(4):   
+    plt.plot(LogTimes[i],LogSales[i],label=r'Log of Scaled Order '+f'{i}'+r' Buyers, $\sigma^{\rho}=$'+str(sig)+ r' , $\beta$= '+str(beta)+', N='+str(m**(n-i)))
+
+plt.legend(prop={"size":11})   
+
+
+
+
+
         

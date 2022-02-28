@@ -12,11 +12,11 @@ import random
 
 
 sig=3
-beta=1.2
+beta=0.4
 rho=1
 k=1
-m=5#Number of subgroups per group
-N=4#Number of levels in heirarchy including top layer with everyone
+m=2#Number of subgroups per group
+N=6#Number of levels in heirarchy including top layer with everyone
 n=N-1#
 agents=m**n
 
@@ -38,7 +38,7 @@ def Hrarchy_Vect(i):
 
 #%%
 
-length=400
+length=800
 height=length/N
 plt.axes()
 for i in range(N):
@@ -49,8 +49,11 @@ for i in range(N):
 
 
 plt.axis('scaled')
+plt.xticks([])
+plt.yticks([])
 plt.show()
-
+filenumber=0
+plt.savefig('Visualisation\Gif'+str(filenumber)+'.png')
 #%%
 #Performing iterations
 S_vector_old=np.zeros(agents)
@@ -93,26 +96,7 @@ while Hrarchy_Sold_Bool[n][0]==0:
     for HrarchyRow in range(N):#[0,1,2,...n]
         #This updates the numerical Hrarchy matrix
         Hrarchy_Sold_Numbers[HrarchyRow][int(Hrarchy_Vect(buyer)[HrarchyRow])]+=1
-    """
-    Boost
-    -----
     
-    List/Array of buy_times from previous iteration or initialisation) known. 
-    From list of indices of unsold agents, find smallest time t'. 
-    t=t', append this to times array. 
-    
-    Index of agent with buy time t' is i. Then assert that this guy has sold 
-    using:
-        
-    Hrarchy_Sold_Bool[0][i]=1
-    for HrarchyRow in range(N):#[0,1,2,...n]
-        #This updates the numerical Hrarchy matrix
-        Column=Hrarchy_Vect(i)[HrarchyRow]
-        Column=int(Column)
-        Hrarchy_Sold_Numbers[HrarchyRow][Column]+=1
-    
-    Now the code knows this guy has sold. Continue with the origianl code: 
-    """
     
     #Getting boolean Hrarchy matrix from numerical matrix
     for i in range(1,N):
@@ -121,7 +105,8 @@ while Hrarchy_Sold_Bool[n][0]==0:
                 Hrarchy_Sold_Bool[i][j]=1
                 rectangle = plt.Rectangle((j*length*m**(-n+i),height*(n-i)), length*m**(-n+i), height, fc='red',ec="black")
                 plt.gca().add_patch(rectangle)
-                  
+    filenumber+=1 
+    plt.savefig('Visualisation\Gif'+str(filenumber)+'.png')             
     plt.pause(1e-20)          
     #Getting matrix to find S values
     Hrarchy_S=np.zeros((N,agents))#number of full n-1 order objcts in n ordr obj        
