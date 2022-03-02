@@ -13,11 +13,11 @@ import random
 
 
 sig=3
-beta=1
+beta=6
 rho=1
 k=1
-m=10000#Number of subgroups per group
-N=2#Number of levels in heirarchy including top layer with everyone
+m=2#Number of subgroups per group
+N=14#Number of levels in heirarchy including top layer with everyone
 n=N-1#
 agents=m**n
 
@@ -64,7 +64,7 @@ TimeArray=np.array([-np.log(1-random.random())/(k*sig**rho) for i in range(agent
 t,buyer=Boost(TimeArray)
 t_old=t
 #%%
-BuyingPercentage=0.9 #Choose when the market is considered to be dominated
+BuyingPercentage=0.95 #Choose when the market is considered to be dominated
 
 while abs(Hrarchy_Sold_Bool[n][0])<BuyingPercentage:
    
@@ -116,7 +116,7 @@ plt.xlabel(r'Non-dimensional time ',size=15)
 plt.ylabel('Buyers',size=15) 
 
 plt.plot(times,sales,label=r'$\sigma^{\rho}=$'+str(sig)+ r' , $\beta$= '+str(beta)+', N='+str(m**n)+r', Sold/Bought Fraction='+str(BuyingPercentage))
-plt.legend()    
+plt.legend(prop={"size":11})    
         
     
 
