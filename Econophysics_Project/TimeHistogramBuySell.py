@@ -14,11 +14,11 @@ import random
 
 
 sig=3
-beta=0
+beta=1.5
 rho=1
 k=1
-m=2#Number of subgroups per group
-N=8#Number of levels in heirarchy including top layer with everyone
+m=10#Number of subgroups per group
+N=5#Number of levels in heirarchy including top layer with everyone
 n=N-1#
 agents=m**n
 
