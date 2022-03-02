@@ -13,7 +13,7 @@ beta=1
 rho=1
 k=1
 m=2#Number of subgroups per group
-N=8#Number of levels in heirarchy including top layer with everyone
+N=12#Number of levels in heirarchy including top layer with everyone
 n=N-1#
 agents=m**n
 
@@ -54,7 +54,8 @@ tc=[]
 TimeArrayOriginal=np.array([-np.log(1-random.random())/(k*sig**rho) for i in range(agents)]) #Generate times from distribution
 tAvg=np.mean(TimeArrayOriginal)
 
-for trial in range(1000):
+simulations=10000
+for trial in range(simulations):
   print(trial)
   S_vector_old=np.zeros(agents)
   Change_Times_List=[]
@@ -68,15 +69,7 @@ for trial in range(1000):
   Hrarchy_Sold_Numbers=np.zeros((N,agents))
   TimeArray=np.array([TimeArrayOriginal[i] for i in range(len(TimeArrayOriginal))])
   while Hrarchy_Sold_Bool[n][0]==0:
-    ##############################################
-    
-    #This bit creates list of indices of agents who haven't sold
-    #This could be streamlined with new boost method, but we'll do that later. 
-    
-    # UnsoldAgntsInds=np.array([],dtype=int)
-    # for i in range(m**n):
-    #     if Hrarchy_Sold_Bool[0][i]==0:
-    #         UnsoldAgntsInds=np.append(UnsoldAgntsInds,i)
+   
             
     t,buyer=Boost(TimeArray)  #Finds smallest time and the buyer index corresponding to that time
     
@@ -130,15 +123,15 @@ for trial in range(1000):
     S_vector_old=S_vector 
     TimeArray[buyer]=1e7 #make sure this buyer never gets picked again by boost method
   
-    #t+=dt, assumed this bit is no longer needed as no longer using FD method
+ 
   tc.append(times[-1])        
 #%%
 #plotting 
 plt.figure(0)
 plt.xlabel(r'Time of Crash',size=15)
 plt.ylabel('Number of Ocurrences',size=15) 
-BINS=25
-counts,bins,bars=plt.hist(tc,label=r'$t_c=$'+f'{tAvg:.3f}'+r', $\beta=$'+f'{beta:.2f}',density=True,bins=BINS)
+BINS=35
+counts,bins,bars=plt.hist(tc,label=r'$t_c=$'+f'{tAvg:.3f}'+r', $\beta=$'+f'{beta:.2f}'+f', {simulations:.0f}'+' Simulations',density=False,bins=BINS)
 plt.legend()    
 centers=[(bins[i]+bins[i+1])/2 for i in range(BINS)]
 
@@ -146,10 +139,10 @@ ExpMean=centers[np.where(counts == np.max(counts))[0][0]]
 def Gaussian(x,mean,sigma,A):
     return(A*np.exp(-(x-mean)**2/(2*sigma**2)))
 
-Parameters,cov=optimize.curve_fit(Gaussian,centers,counts,p0=[ExpMean,np.std(tc),np.max(counts)])
+Parameters,cov=optimize.curve_fit(Gaussian,centers,counts,p0=[tAvg,np.std(tc),np.max(counts)])
 error=np.sqrt(cov[0][0])
 
-plt.plot(centers,Gaussian(centers,Parameters[0],Parameters[1],Parameters[2]),label=r'$\mu$='+f'{Parameters[0]:.3f}'+r' $\pm$'+f'{error:.3f}'+r', $\sigma=$ '+f'{Parameters[1]:.2f}')
+plt.plot(centers,Gaussian(centers,Parameters[0],Parameters[1],Parameters[2]),label=r'$\mu$='+f'{Parameters[0]:.3f}'+r' $\pm$'+f'{error:.3f}'+r', $\sigma=$ '+f'{Parameters[1]:.2f}'+', N='+f'{agents:.0f}')
 plt.legend()
 
 
