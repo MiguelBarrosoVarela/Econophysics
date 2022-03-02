@@ -14,7 +14,7 @@ import random
 
 
 sig=3
-Beta=0.3
+Beta=5
 rho=1
 k=1
 m=2#Number of subgroups per group
@@ -25,8 +25,10 @@ agents=m**n
 betaArray=[Beta for i in range(agents)]
 
 def beta(i,t):
-        return(betaArray[i]*t)
+    if  t<0.5: return(0)
+    else: return (betaArray[i]) 
 
+    
 def Boost(x): # x is the array of times
   t=min(x) #find smallest time
   buyer=np.where(x == t)[0] #find index of buyer
@@ -58,10 +60,6 @@ for i in range(1,N):
 
             
 
-"""
-Need to initialise buy_time array - so first buy-time array
-
-"""
 
 
 
@@ -69,13 +67,13 @@ TimeArray=np.array([-np.log(1-random.random())/(k*sig**rho) for i in range(agent
 t,buyer=Boost(TimeArray)
 t_old=t
 #%%
-BuyingPercentage=0.9 #Choose when the market is considered to be dominated
+BuyingPercentage=0.90 #Choose when the market is considered to be dominated
 
 while abs(Hrarchy_Sold_Bool[n][0])<BuyingPercentage:
    
             
     t,buyer=Boost(TimeArray)  #Finds smallest time and the buyer index corresponding to that time
-    if t/t_old>10:
+    if t-t_old>0.1:
         break #stops if the next time to buy is super super far (market dominated)
     t_old=t  
     

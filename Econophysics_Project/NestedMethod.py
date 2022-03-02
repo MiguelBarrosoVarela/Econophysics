@@ -66,15 +66,15 @@ for i in SortedTimes:
         j+=1
     else: 
         break   
-#plt.figure(2)
-#plt.plot(SortedTimes,BuyList)
+plt.figure(2)
+plt.plot(SortedTimes,BuyList)
 
-plt.figure(3)
-plt.xlabel(r'log($t_c-t$)',size=15)
-plt.ylabel('Log(Buyers/N)',size=15)   #Plots logarithmic t-tc VS logarithmic buyers
-plt.gca().invert_xaxis()
+#plt.figure(3)
+#plt.xlabel(r'log($t_c-t$)',size=15)
+#plt.ylabel('Log(Buyers/N)',size=15)   #Plots logarithmic t-tc VS logarithmic buyers
+#plt.gca().invert_xaxis()
 
-plt.plot(LoggedTimes,LoggedBuy)
+#lt.plot(LoggedTimes,LoggedBuy)
 
 
 

@@ -1,22 +1,19 @@
 # -*- coding: utf-8 -*-
-"""
-Created on Fri Feb  4 15:14:40 2022
-"""
 
 import numpy as np
 import matplotlib.pyplot as plt
 import random
-
+from scipy import optimize
 #%%
 #Initialisation
 
 
 sig=3
-beta=0.4
+beta=1
 rho=1
 k=1
 m=2#Number of subgroups per group
-N=6#Number of levels in heirarchy including top layer with everyone
+N=8#Number of levels in heirarchy including top layer with everyone
 n=N-1#
 agents=m**n
 
@@ -37,24 +34,6 @@ def Hrarchy_Vect(i):
 
 
 #%%
-
-length=800
-height=length/N
-plt.axes()
-for i in range(N):
-    
-    for j in range(m**i):  
-        rectangle = plt.Rectangle((j*length*m**(-i),height*i), length*m**(-i), height, fc='white',ec="black")
-        plt.gca().add_patch(rectangle)
-
-
-plt.axis('scaled')
-plt.xticks([])
-plt.yticks([])
-plt.show()
-filenumber=0
-plt.savefig('Visualisation\Gif'+str(filenumber)+'.png')
-#%%
 #Performing iterations
 S_vector_old=np.zeros(agents)
 Change_Times_List=[]
@@ -67,15 +46,28 @@ S_vector=np.zeros(m**n)#List of S values
 Hrarchy_Sold_Bool=np.zeros((N,agents))
 Hrarchy_Sold_Numbers=np.zeros((N,agents))
 
-"""
-Need to initialise buy_time array - so first buy-time array
-
-"""
-
-TimeArray=np.array([-np.log(1-random.random())/(k*sig**rho) for i in range(agents)]) #Generate times from distribution
 
 
-while Hrarchy_Sold_Bool[n][0]==0:
+
+#%%
+tc=[]
+TimeArrayOriginal=np.array([-np.log(1-random.random())/(k*sig**rho) for i in range(agents)]) #Generate times from distribution
+tAvg=np.mean(TimeArrayOriginal)
+
+for trial in range(1000):
+  print(trial)
+  S_vector_old=np.zeros(agents)
+  Change_Times_List=[]
+  t=0#Initialising time
+  Finish=0
+  times=np.array([])#List of times where agents buy
+  sales=np.array([])#Sales at each time where agents buy
+  sigmas=sig*np.ones(m**n)# List of sigma values for agents
+  S_vector=np.zeros(m**n)#List of S values
+  Hrarchy_Sold_Bool=np.zeros((N,agents))
+  Hrarchy_Sold_Numbers=np.zeros((N,agents))
+  TimeArray=np.array([TimeArrayOriginal[i] for i in range(len(TimeArrayOriginal))])
+  while Hrarchy_Sold_Bool[n][0]==0:
     ##############################################
     
     #This bit creates list of indices of agents who haven't sold
@@ -89,10 +81,6 @@ while Hrarchy_Sold_Bool[n][0]==0:
     t,buyer=Boost(TimeArray)  #Finds smallest time and the buyer index corresponding to that time
     
     Hrarchy_Sold_Bool[0][buyer]=1
-    rectangle = plt.Rectangle((buyer*length*m**(-n),height*n), length*m**(-n), height, fc='red',ec="black")
-    plt.gca().add_patch(rectangle)
- 
-    
     for HrarchyRow in range(N):#[0,1,2,...n]
         #This updates the numerical Hrarchy matrix
         Hrarchy_Sold_Numbers[HrarchyRow][int(Hrarchy_Vect(buyer)[HrarchyRow])]+=1
@@ -103,11 +91,7 @@ while Hrarchy_Sold_Bool[n][0]==0:
         for j in range(m**(n-i)):
             if Hrarchy_Sold_Numbers[i][j]==m**i:
                 Hrarchy_Sold_Bool[i][j]=1
-                rectangle = plt.Rectangle((j*length*m**(-n+i),height*(n-i)), length*m**(-n+i), height, fc='red',ec="black")
-                plt.gca().add_patch(rectangle)
-    filenumber+=1 
-    plt.savefig('Visualisation\Gif'+str(filenumber)+'.png')             
-    plt.pause(1e-20)          
+    
     #Getting matrix to find S values
     Hrarchy_S=np.zeros((N,agents))#number of full n-1 order objcts in n ordr obj        
     Hrarchy_S[0]=Hrarchy_Sold_Numbers[0]
@@ -128,22 +112,7 @@ while Hrarchy_Sold_Bool[n][0]==0:
     #This calculates new_sigmas
         sigmas[i]=sig**rho*2**(S_vector[i]*beta)    
     
-    """
-    Generate new buy times
-    ----------------------
-    
-    S_vector is the list of S values for the agents. E.g. S_vector[3] is the S
-    value for the agent with index 3. Perhaps store the previous s vector and 
-    compare this to the current S_vector. 
-    
-    For the agents with changed S_vector values, generate new times. Use the 
-    PDF to generate dt. Then add dt to t (which is the time of this iteration)
-    - this is their new buy time. 
-
-    
-
-    """
-    
+   
     for j in range(len(TimeArray)):
         if S_vector[j]==S_vector_old[j] or TimeArray[j]==1e7:  #Does what is described above
             pass
@@ -151,8 +120,8 @@ while Hrarchy_Sold_Bool[n][0]==0:
             TimeArray[j]=t-(np.log(1-random.random())/(k*sigmas[j]))
     
     ###############################################
-    print(t)# Current time 
-    print(Hrarchy_Sold_Numbers[n][0])#Total number of bought agents
+    # Current time 
+    #Total number of bought agents
     times=np.append(times,t)
     sales=np.append(sales,Hrarchy_Sold_Numbers[n][0])
     #plt.plot(times,sales,'k')    
@@ -160,13 +129,29 @@ while Hrarchy_Sold_Bool[n][0]==0:
     #plt.pause(0.00001)             #this makes code slower of course
     S_vector_old=S_vector 
     TimeArray[buyer]=1e7 #make sure this buyer never gets picked again by boost method
+  
+    #t+=dt, assumed this bit is no longer needed as no longer using FD method
+  tc.append(times[-1])        
+#%%
+#plotting 
+plt.figure(0)
+plt.xlabel(r'Time of Crash',size=15)
+plt.ylabel('Number of Ocurrences',size=15) 
+BINS=25
+counts,bins,bars=plt.hist(tc,label=r'$t_c=$'+f'{tAvg:.3f}'+r', $\beta=$'+f'{beta:.2f}',density=True,bins=BINS)
+plt.legend()    
+centers=[(bins[i]+bins[i+1])/2 for i in range(BINS)]
+
+ExpMean=centers[np.where(counts == np.max(counts))[0][0]]
+def Gaussian(x,mean,sigma,A):
+    return(A*np.exp(-(x-mean)**2/(2*sigma**2)))
+
+Parameters,cov=optimize.curve_fit(Gaussian,centers,counts,p0=[ExpMean,np.std(tc),np.max(counts)])
+error=np.sqrt(cov[0][0])
+
+plt.plot(centers,Gaussian(centers,Parameters[0],Parameters[1],Parameters[2]),label=r'$\mu$='+f'{Parameters[0]:.3f}'+r' $\pm$'+f'{error:.3f}'+r', $\sigma=$ '+f'{Parameters[1]:.2f}')
+plt.legend()
 
 
 
 
-
-
-        
-
-        
-    
