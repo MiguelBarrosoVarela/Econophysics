@@ -6,7 +6,7 @@ import matplotlib.pyplot as plt
 import random
 #%%
 sig=3
-beta=4
+beta=0
 rho=1
 k=1
 m=2#Number of subgroups per group

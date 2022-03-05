@@ -12,12 +12,12 @@ import random
 #Initialisation
 
 
-sig=3
-beta=1
+sig=2
+beta=4
 rho=1
 k=1
 m=2#Number of subgroups per group
-N=12#Number of levels in heirarchy including top layer with everyone
+N=14#Number of levels in heirarchy including top layer with everyone
 n=N-1#
 agents=m**n
 
@@ -163,8 +163,9 @@ plt.figure(0)
 plt.xlabel(r'Non-dimensional time ',size=15)
 plt.ylabel('Buyers',size=15) 
 
-plt.plot(times,sales,label=r'$\sigma^{\rho}=$'+str(sig)+ r' , $\beta$= '+str(beta)+', N='+str(m**n))
-plt.legend()    
+plt.plot(times,sales,label=r'$\sigma^{\rho}=$'+str(sig)+ r' , $\beta$= '+str(beta)+', N='+str(m**n),linewidth=2,color='black')
+plt.legend(prop={"size":11})   
+plt.grid(True)
 #%%
 
 #Log Plotting
@@ -179,8 +180,8 @@ plt.figure(2)
 plt.gca().invert_xaxis()
 plt.xlabel(r'log($t_c-t$)',size=15)
 plt.ylabel('Log(Buyers)',size=15) 
-plt.plot(LoggedTimes,np.log(sales[:len(LoggedTimes):]))
-        
+plt.plot(LoggedTimes,np.log(sales[:len(LoggedTimes):]),color='black')
+plt.grid(True)
     
 
 
