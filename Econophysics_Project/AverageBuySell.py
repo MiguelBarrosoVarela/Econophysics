@@ -13,11 +13,11 @@ import random
 
 
 sig=3
-beta=0
+beta=1
 rho=1
 k=1
 m=2#Number of subgroups per group
-N=13#Number of levels in heirarchy including top layer with everyone
+N=14#Number of levels in heirarchy including top layer with everyone
 n=N-1#
 agents=m**n
 
@@ -64,13 +64,15 @@ TimeArray=np.array([-np.log(1-random.random())/(k*sig**rho) for i in range(agent
 t,buyer=Boost(TimeArray)
 t_old=t
 #%%
-BuyingPercentage=0.95 #Choose when the market is considered to be dominated
+BuyingPercentage=1 #Choose when the market is considered to be dominated
 
 while abs(Hrarchy_Sold_Bool[n][0])<BuyingPercentage:
    
-            
+    #if abs(Hrarchy_Sold_Bool[n][0])>0.95:  #trying to get post-crash behaviour
+       # beta=-0.5
     t,buyer=Boost(TimeArray)  #Finds smallest time and the buyer index corresponding to that time
     if t/t_old>10:
+        string=', Market Saturated'
         break #stops if the next time to buy is super super far (market dominated)
     t_old=t  
     
@@ -109,6 +111,7 @@ while abs(Hrarchy_Sold_Bool[n][0])<BuyingPercentage:
     #plt.show()                     #in case you want to animate the market
     #plt.pause(0.0000001)             #this makes code slower of course
     S_vector_old=S_vector 
+    string=r', Sold/Bought Fraction='+str(BuyingPercentage)
 
 #%%        
 
@@ -118,7 +121,7 @@ plt.ylim([min(salesAbs), max(salesAbs)])
 plt.xlabel(r'Non-dimensional time ',size=15)
 plt.ylabel('Stock Price',size=15) 
 plt.fill_between(times,salesAbs,alpha=0.5)
-plt.plot(times,salesAbs,label=r'$\sigma^{\rho}=$'+str(sig)+ r' , $\beta$= '+str(beta)+', N='+str(m**n)+r', Sold/Bought Fraction='+str(BuyingPercentage),color='black')
+plt.plot(times,salesAbs,label=r'$\sigma^{\rho}=$'+str(sig)+ r' , $\beta$= '+str(beta)+', N='+str(m**n)+string,color='black')
 plt.legend(prop={"size":11})    
 plt.grid(axis='y')
     
