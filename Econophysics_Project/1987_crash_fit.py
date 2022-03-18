@@ -45,7 +45,7 @@ def LogPeriodic(t,tc,a,w,C,A,B,P):
 x = [dt.datetime.strptime(d,'%d/%m/%Y').date() for d in true_dates]
 plt.gca().xaxis.set_major_formatter(mdates.DateFormatter('%d/%m/%Y'))
 plt.gca().xaxis.set_major_locator(mdates.DayLocator(interval=5000))
-plt.plot(x,stock_values)
+#plt.plot(x,stock_values)
 plt.gcf().autofmt_xdate()
 #%% Performing fit 
 stock_values=stock_values[::-1]   
@@ -62,17 +62,21 @@ fit_stocks=stock_values[lower_bound:upper_bound]
 parameters=[87.74,0.33,7.4,12.2/-165,412,-165,2]
 popt, pcov = curve_fit(LogPeriodic,fit_dates,fit_stocks, parameters, maxfev=5000)
 ydata=LogPeriodic(fit_dates,*popt)
-plt.plot(fit_labels,fit_stocks)
-plt.plot(fit_labels,ydata)
+#plt.plot(fit_labels,fit_stocks)
+#plt.plot(fit_labels,ydata)
 #%%Plotting fit against dates
 #Take care with the data flipping
 
 x = [dt.datetime.strptime(d,'%d/%m/%Y').date() for d in true_dates][lower_bound:upper_bound]
 plt.gca().xaxis.set_major_formatter(mdates.DateFormatter('%d/%m/%Y'))
 plt.gca().xaxis.set_major_locator(mdates.DayLocator(interval=140))
-plt.plot(x,fit_stocks[::-1])
+plt.plot(x,fit_stocks[::-1],color='black',label='Stock Market Data')
 plt.gcf().autofmt_xdate()
-plt.plot(x,ydata[::-1],color='black')
-
-plt.xlabel('Date')
-plt.ylabel('S&P 500 value')
+plt.plot(x,ydata[::-1],color='red',label='Log-Periodic Fit')
+plt.fill_between(x,fit_stocks[::-1],alpha=0.5)
+plt.ylim([min(fit_stocks), max(fit_stocks)])
+plt.rc('xtick', labelsize=12) 
+plt.legend(prop={"size":11})    
+plt.grid(axis='y')
+plt.xlabel('Date',size=17)
+plt.ylabel('S&P 500 value',size=15)
