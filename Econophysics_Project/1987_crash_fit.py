@@ -27,7 +27,8 @@ for date in range(len(stock_values)):
         closed_market_dates.append(date)
 stock_values=np.delete(stock_values,closed_market_dates)
 true_dates=np.delete(true_dates,closed_market_dates)
-
+stock_values=stock_values[::-1]  
+true_dates=true_dates[::-1]
 
 #Flipping stock values (in original data set recent values at top)
 #Only relevant for idices as dates. 
@@ -48,7 +49,7 @@ plt.gca().xaxis.set_major_locator(mdates.DayLocator(interval=5000))
 #plt.plot(x,stock_values)
 plt.gcf().autofmt_xdate()
 #%% Performing fit 
-stock_values=stock_values[::-1]   
+ 
 #100 to 560 is the best range
 upper_bound=560
 lower_bound=100
@@ -67,6 +68,24 @@ ydata=LogPeriodic(fit_dates,*popt)
 #%%Plotting fit against dates
 #Take care with the data flipping
 
+plot_dates = [dt.datetime.strptime(d,'%d/%m/%Y').date() for d in true_dates][100:650]
+plot_stocks=stock_values[100:650]
+plt.gca().xaxis.set_major_formatter(mdates.DateFormatter('%d/%m/%Y'))
+plt.gca().xaxis.set_major_locator(mdates.DayLocator(interval=140))
+plt.plot(plot_dates,plot_stocks,color='black',label='Stock Market Data')
+
+x = [dt.datetime.strptime(d,'%d/%m/%Y').date() for d in true_dates][lower_bound:upper_bound]
+plt.plot(x,ydata,color='red',label='Log-Periodic Fit')
+
+plt.fill_between(plot_dates,plot_stocks,alpha=0.5)
+plt.ylim([min(fit_stocks), max(fit_stocks)])
+plt.rc('xtick', labelsize=12) 
+plt.legend(prop={"size":11})    
+plt.grid(axis='y')
+plt.xlabel('Date',size=17)
+plt.ylabel('S&P 500 value',size=15)
+
+"""
 x = [dt.datetime.strptime(d,'%d/%m/%Y').date() for d in true_dates][lower_bound:upper_bound]
 plt.gca().xaxis.set_major_formatter(mdates.DateFormatter('%d/%m/%Y'))
 plt.gca().xaxis.set_major_locator(mdates.DayLocator(interval=140))
@@ -80,3 +99,4 @@ plt.legend(prop={"size":11})
 plt.grid(axis='y')
 plt.xlabel('Date',size=17)
 plt.ylabel('S&P 500 value',size=15)
+"""
