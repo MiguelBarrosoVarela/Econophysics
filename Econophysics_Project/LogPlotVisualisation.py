@@ -4,6 +4,8 @@ Created on Sat Mar 19 17:07:30 2022
 
 """
 import numpy as np
+import matplotlib 
+matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 import random
 
@@ -79,8 +81,7 @@ while Hrarchy_Sold_Bool[n][0]==0:
     t,buyer=Boost(TimeArray)  #Finds smallest time and the buyer index corresponding to that time
     
     Hrarchy_Sold_Bool[0][buyer]=1
-    rectangle = plt.Rectangle((buyer*length*m**(-n),height*n), length*m**(-n), height, fc='red',ec="black")
-    plt.gca().add_patch(rectangle)
+    
     
     
     
@@ -89,12 +90,18 @@ while Hrarchy_Sold_Bool[n][0]==0:
 #This updates the numerical Hrarchy matrix
    
     #Getting boolean Hrarchy matrix from numerical matrix
-    for i in range(1,N):
+    for i in range(0,N):
         for j in range(m**(n-i)):
             if Hrarchy_Sold_Numbers[i][j]==m**i:
                 Hrarchy_Sold_Bool[i][j]=1
                 rectangle = plt.Rectangle((j*length*m**(-n+i),height*(n-i)), length*m**(-n+i), height, fc='red',ec="black")
                 plt.gca().add_patch(rectangle)
+            else:
+                rectangle = plt.Rectangle((j*length*m**(-n+i),height*(n-i)), length*m**(-n+i), height, fc='white',ec="black")
+                plt.gca().add_patch(rectangle)
+    plt.axis('scaled')
+    plt.xticks([])
+    plt.yticks([])
     filenumber+=1 
     plt.savefig('Visualisation\Gif'+str(filenumber)+'.png')   
     
@@ -138,7 +145,8 @@ while Hrarchy_Sold_Bool[n][0]==0:
     #plt.pause(0.00001)             #this makes code slower of course
     S_vector_old=S_vector 
     TimeArray[buyer]=1e7 #make sure this buyer never gets picked again by boost method
-  
+    plt.clf()
+   
     #t+=dt, assumed this bit is no longer needed as no longer using FD method
         
 
@@ -146,6 +154,7 @@ while Hrarchy_Sold_Bool[n][0]==0:
 
 #Log Plotting
 plt.figure(2)
+plt.clf()
 tc=times[-1]
 LoggedTimes=[]
 LoggedSales=[]
