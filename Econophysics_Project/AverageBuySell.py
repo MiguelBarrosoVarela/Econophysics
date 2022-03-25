@@ -28,17 +28,17 @@ def Boost(x): # x is the array of times
   buyer=np.where(x == t)[0] #find index of buyer
   return(t,buyer)
 
-def Config():
+def Config(index):
     length=400
     height=length/N
     plt.axes()
     for i in range(N):
         
         for j in range(m**i):  
-          if Hrarchy_Sold_Bool[-i-1][j]<0:   
+          if Hierarchy[index][-i-1][j]<0:   
               rectangle = plt.Rectangle((j*length*m**(-i),height*i), length*m**(-i), height, fc='red',ec="black")
               plt.gca().add_patch(rectangle)
-          elif Hrarchy_Sold_Bool[-i-1][j]>0: 
+          elif Hierarchy[index][-i-1][j]>0: 
               rectangle = plt.Rectangle((j*length*m**(-i),height*i), length*m**(-i), height, fc='blue',ec="black")
               plt.gca().add_patch(rectangle)
           else:
@@ -48,7 +48,7 @@ def Config():
     plt.axis('scaled')
     plt.show()
 
-
+Hierarchy=[]
 
 #%%
 #Performing iterations
@@ -118,7 +118,7 @@ while abs(Hrarchy_Sold_Bool[n][0])<BuyingPercentage and t<100:
         else: #generates new time using the new sigmas 
             TimeArray[j]=t-(np.log(1-random.random())/(k*sigmas[j]))
             
-
+    Hierarchy.append(Hrarchy_Sold_Bool)
     ###############################################
     print(t)# Current time 
     SUM=sum(Hrarchy_Sold_Bool[0][j] for j in range(agents))
