@@ -28,7 +28,25 @@ def Boost(x): # x is the array of times
   buyer=np.where(x == t)[0] #find index of buyer
   return(t,buyer)
 
+def Config():
+    length=400
+    height=length/N
+    plt.axes()
+    for i in range(N):
+        
+        for j in range(m**i):  
+          if Hrarchy_Sold_Bool[-i-1][j]<0:   
+              rectangle = plt.Rectangle((j*length*m**(-i),height*i), length*m**(-i), height, fc='red',ec="black")
+              plt.gca().add_patch(rectangle)
+          elif Hrarchy_Sold_Bool[-i-1][j]>0: 
+              rectangle = plt.Rectangle((j*length*m**(-i),height*i), length*m**(-i), height, fc='blue',ec="black")
+              plt.gca().add_patch(rectangle)
+          else:
+              rectangle = plt.Rectangle((j*length*m**(-i),height*i), length*m**(-i), height, fc='white',ec="black")
+              plt.gca().add_patch(rectangle)
 
+    plt.axis('scaled')
+    plt.show()
 
 
 
@@ -107,9 +125,9 @@ while abs(Hrarchy_Sold_Bool[n][0])<BuyingPercentage and t<100:
     print(SUM)#Total number of bought agents
     times=np.append(times,t)
     sales=np.append(sales,SUM)
-    plt.plot(times,sales,'k')    
-    plt.show()                     #in case you want to animate the market
-    plt.pause(0.0000001)             #this makes code slower of course
+    #plt.plot(times,sales,'k')    
+    #plt.show()                     #in case you want to animate the market
+    #plt.pause(0.0000001)             #this makes code slower of course
     S_vector_old=S_vector 
     string=r', Sold/Bought Fraction='+str(BuyingPercentage)
 
