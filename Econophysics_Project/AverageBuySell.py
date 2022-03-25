@@ -13,11 +13,11 @@ import random
 
 
 sig=3
-beta=3
+beta=4
 rho=1
 k=1
 m=2#Number of subgroups per group
-N=11#Number of levels in heirarchy including top layer with everyone
+N=10#Number of levels in heirarchy including top layer with everyone
 n=N-1#
 agents=m**n
 
@@ -28,27 +28,9 @@ def Boost(x): # x is the array of times
   buyer=np.where(x == t)[0] #find index of buyer
   return(t,buyer)
 
-def Config(index):
-    length=400
-    height=length/N
-    plt.axes()
-    for i in range(N):
-        
-        for j in range(m**i):  
-          if Hierarchy[index][-i-1][j]<0:   
-              rectangle = plt.Rectangle((j*length*m**(-i),height*i), length*m**(-i), height, fc='red',ec="black")
-              plt.gca().add_patch(rectangle)
-          elif Hierarchy[index][-i-1][j]>0: 
-              rectangle = plt.Rectangle((j*length*m**(-i),height*i), length*m**(-i), height, fc='blue',ec="black")
-              plt.gca().add_patch(rectangle)
-          else:
-              rectangle = plt.Rectangle((j*length*m**(-i),height*i), length*m**(-i), height, fc='white',ec="black")
-              plt.gca().add_patch(rectangle)
 
-    plt.axis('scaled')
-    plt.show()
 
-Hierarchy=[]
+
 
 #%%
 #Performing iterations
@@ -59,7 +41,7 @@ sales=np.array([])#Sales at each time where agents buy
 sigmas=sig*np.ones(agents)# List of sigma values for agents
 S_vector=np.zeros(agents)#List of S values
 Hrarchy_Sold_Bool=np.zeros((N,agents))
-
+Hierarchy=[Hrarchy_Sold_Bool]
 
 Split=0.5 # Approximate Starting Conditions: N_sellers/N_total
 
@@ -116,9 +98,9 @@ while abs(Hrarchy_Sold_Bool[n][0])<BuyingPercentage and t<100:
         if S_vector[j]==S_vector_old[j]:  #Does what is described above
             pass
         else: #generates new time using the new sigmas 
-            TimeArray[j]=t-(np.log(1-random.random())/(k*sigmas[j]))
-            
-    Hierarchy.append(Hrarchy_Sold_Bool)
+            TimeArray[j]=t-(np.log(1-random.random())/(k*sigmas[j]))      
+    
+    Hierarchy.append(np.copy(Hrarchy_Sold_Bool ))
     ###############################################
     print(t)# Current time 
     SUM=sum(Hrarchy_Sold_Bool[0][j] for j in range(agents))
@@ -132,6 +114,29 @@ while abs(Hrarchy_Sold_Bool[n][0])<BuyingPercentage and t<100:
     string=r', Sold/Bought Fraction='+str(BuyingPercentage)
 
 #%%        
+
+
+def Config(index):
+    plt.clf()
+    length=400
+    height=length/N
+    plt.axes()
+    for i in range(N):
+        
+        for j in range(m**i):  
+          if Hierarchy[index][-i-1][j]<0:   
+              rectangle = plt.Rectangle((j*length*m**(-i),height*i), length*m**(-i), height, fc='red',ec="black")
+              plt.gca().add_patch(rectangle)
+          elif Hierarchy[index][-i-1][j]>0: 
+              rectangle = plt.Rectangle((j*length*m**(-i),height*i), length*m**(-i), height, fc='blue',ec="black")
+              plt.gca().add_patch(rectangle)
+          else:
+              rectangle = plt.Rectangle((j*length*m**(-i),height*i), length*m**(-i), height, fc='white',ec="black")
+              plt.gca().add_patch(rectangle)
+
+    plt.axis('scaled')
+    plt.show()
+#%%
 
 salesAbs=[(sales[i]+agents)/(2*agents) for i in range(len(sales))]
 plt.figure(0)
