@@ -23,7 +23,7 @@ def Hrarchy_Vect(i,N,m):
 
 
 #%%Turning it into a function
-def BuyOnlySimulation(m,N,lam,beta,progress=False,plot=False):
+def BuyOnlySimulation(m,N,lam,beta,progress=False,plot=False,fraction_plot=False):
 
     """
 
@@ -127,21 +127,23 @@ def BuyOnlySimulation(m,N,lam,beta,progress=False,plot=False):
       
         #t+=dt, assumed this bit is no longer needed as no longer using FD method
             
-        
-        #%%
     if plot==True:
+        
         #plotting 
         plt.figure(0)
         plt.xlabel(r'Non-dimensional time ',size=15)
         plt.ylabel('Buyers',size=15) 
         
-        plt.plot(times,sales,label=r'$\sigma^{\rho}=$'+str(sig)+ r' , $\beta$= '+str(beta)+', N='+str(m**n),linewidth=2,color='black')
+        if fraction_plot==True:
+            plt.plot(times/times[-1],sales/sales[-1],label= r'$\beta$= '+str(beta)+', N='+str(N)+' m='+str(m),linewidth=2)      
+        else:
+            plt.plot(times,sales,label= r'$\beta$= '+str(beta)+', N='+str(N)+'m='+str(m),linewidth=2)
+        
+        
         plt.legend(prop={"size":11})   
         plt.grid(True)
-        #%%
         
         #Log Plotting
-        
         tc=times[-1]
         LoggedTimes=[]
         for j in times:

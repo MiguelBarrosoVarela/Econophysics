@@ -72,10 +72,10 @@ plot_dates = [dt.datetime.strptime(d,'%d/%m/%Y').date() for d in true_dates][100
 plot_stocks=stock_values[100:650]
 plt.gca().xaxis.set_major_formatter(mdates.DateFormatter('%d/%m/%Y'))
 plt.gca().xaxis.set_major_locator(mdates.DayLocator(interval=140))
-plt.plot(plot_dates,plot_stocks,color='black',label='Stock Market Data')
+#plt.plot(plot_dates,plot_stocks,color='blue',label='Stock Market Data')
 
 x = [dt.datetime.strptime(d,'%d/%m/%Y').date() for d in true_dates][lower_bound:upper_bound]
-plt.plot(x,ydata,color='red',label='Log-Periodic Fit')
+plt.plot(x,ydata,color='black',label='Log-Periodic Fit')
 
 plt.fill_between(plot_dates,plot_stocks,alpha=0.5)
 plt.ylim([min(fit_stocks), max(fit_stocks)])
@@ -85,18 +85,4 @@ plt.grid(axis='y')
 plt.xlabel('Date',size=17)
 plt.ylabel('S&P 500 value',size=15)
 
-"""
-x = [dt.datetime.strptime(d,'%d/%m/%Y').date() for d in true_dates][lower_bound:upper_bound]
-plt.gca().xaxis.set_major_formatter(mdates.DateFormatter('%d/%m/%Y'))
-plt.gca().xaxis.set_major_locator(mdates.DayLocator(interval=140))
-plt.plot(x,fit_stocks[::-1],color='black',label='Stock Market Data')
-plt.gcf().autofmt_xdate()
-plt.plot(x,ydata[::-1],color='red',label='Log-Periodic Fit')
-plt.fill_between(x,fit_stocks[::-1],alpha=0.5)
-plt.ylim([min(fit_stocks), max(fit_stocks)])
-plt.rc('xtick', labelsize=12) 
-plt.legend(prop={"size":11})    
-plt.grid(axis='y')
-plt.xlabel('Date',size=17)
-plt.ylabel('S&P 500 value',size=15)
-"""
+
